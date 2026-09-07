@@ -54,8 +54,15 @@ wpi.java.debugJni = false
 //noinspection GroovyUnusedAssignment
 def includeDesktopSupport = false
 
+// AdvantageKit ships the @AutoLog annotation processor in a separate artifact from the runtime
+// jar declared by the vendordep, so it has to be added here by hand. Read the version out of the
+// vendordep itself so the two can't drift apart.
+def akitJson = new groovy.json.JsonSlurper().parseText(
+        file("vendordeps").listFiles().find { it.name.startsWith("AdvantageKit") }.text)
+
 dependencies {
     annotationProcessor wpi.java.deps.wpilibAnnotations()
+    annotationProcessor "org.littletonrobotics.akit:akit-autolog:$akitJson.version"
     implementation wpi.java.deps.wpilib()
     implementation wpi.java.vendor.java()
 
