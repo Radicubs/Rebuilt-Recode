@@ -1,4 +1,4 @@
-package frc.robot.subsystems.intake;
+package frc.robot.subsystems.Intake;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import org.littletonrobotics.junction.Logger;
@@ -16,6 +16,6 @@ final class IntakeLogger {
         Logger.recordOutput("Intake/Setpoint", intake.getSetpoint());
         Logger.recordOutput("Intake/Error", intake.getSetpoint() - intake.getVelocity());
         Logger.recordOutput("Intake/AtSetpoint", intake.atSetpoint());
-        Logger.recordOutput("Intake/PidEnabled", intake.isPidEnabled());
+        // Logger.recordOutput("Intake/PidEnabled", intake.isPidEnabled());
     }
 }

@@ -1,6 +1,7 @@
-package frc.robot.subsystems.intake;
+package frc.robot.subsystems.Intake;
 
 import frc.robot.constants.IntakeConstants;
+import frc.robot.subsystems.Intake.IntakeIOInputsAutoLogged;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.wpilibj.RobotBase;
@@ -44,6 +45,18 @@ public class Intake extends SubsystemBase {
 
     public boolean atSetpoint(){
         return controller.atSetpoint();
+    }
+
+    public double setVelocity(double velocityRPS) {
+        controller.reset();
+        pidEnabled = true;
+        controller.setSetpoint(velocityRPS);
+        return velocityRPS;
+    }
+
+    public void cancelPID() {
+        pidEnabled = false;
+        io.setDutyCycle(0.0);
     }
 
     @Override

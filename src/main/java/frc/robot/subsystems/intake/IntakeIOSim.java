@@ -1,4 +1,4 @@
-package frc.robot.subsystems.intake;
+package frc.robot.subsystems.Intake;
 
 import frc.robot.constants.IntakeConstants;
 import edu.wpi.first.math.MathUtil;
