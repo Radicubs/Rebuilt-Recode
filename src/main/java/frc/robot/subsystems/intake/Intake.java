@@ -32,6 +32,7 @@ public class Intake extends SubsystemBase {
         io.updateInputs(inputs);
         IntakeLogger.publish(this);
     }
+    public boolean isPidEnabled(){return pidEnabled;}
 
 
     public double getVelocity() {
