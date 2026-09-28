@@ -8,22 +8,22 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import org.littletonrobotics.junction.Logger;
 
-public class Intake extends SubsystemBase {
+public class Shooter extends SubsystemBase {
 
-    private static Intake INSTANCE;
-    private final IntakeIO io;
-    private final IntakeIOInputsAutoLogged inputs = new IntakeIOInputsAutoLogged();
+    private static Shooter INSTANCE;
+    private final ShooterIO io;
+    private final ShooterIOInputsAutoLogged inputs = new ShooterIOInputsAutoLogged();
     private boolean pidEnabled = false;
     private final PIDController controller;
     private final SimpleMotorFeedforward feedforward;
 
-    public static Intake getInstance() {
-        if (INSTANCE == null) {INSTANCE = new Intake();}
+    public static Shooter getInstance() {
+        if (INSTANCE == null) {INSTANCE = new Shooter();}
         return INSTANCE;
     }
 
-    private Intake() {
-        io = RobotBase.isSimulation() ? new IntakeIOSim() : new IntakeIOReal();
+    private Shooter() {
+        io = RobotBase.isSimulation() ? new IntakeIOSim() : new ShooterIOReal();
 
         controller = new PIDController(IntakeConstants.PIDFeedforwardConstants.P, IntakeConstants.PIDFeedforwardConstants.I, IntakeConstants.PIDFeedforwardConstants.D);
         controller.setTolerance(IntakeConstants.PIDFeedforwardConstants.pidTolerance);
@@ -31,7 +31,7 @@ public class Intake extends SubsystemBase {
         feedforward = new SimpleMotorFeedforward(IntakeConstants.PIDFeedforwardConstants.S, IntakeConstants.PIDFeedforwardConstants.V, IntakeConstants.PIDFeedforwardConstants.A);
 
         io.updateInputs(inputs);
-        IntakeLogger.publish(this);
+        ShooterLogger.publish(this);
     }
 
 
@@ -65,7 +65,7 @@ public class Intake extends SubsystemBase {
     @Override
     public void periodic() {
         io.updateInputs(inputs);
-        Logger.processInputs("Intake", inputs);
+        Logger.processInputs("Shooter", inputs);
 
         if (pidEnabled) {
             double output = controller.calculate(inputs.velocityRPS)
@@ -73,7 +73,7 @@ public class Intake extends SubsystemBase {
             io.setDutyCycle(output);
         }
 
-        IntakeLogger.log(this);
-        SmartDashboard.putNumber("Intake Veloc", getVelocity());
+        ShooterLogger.log(this);
+        SmartDashboard.putNumber("Shooter Velocity", getVelocity());
     }
 }
