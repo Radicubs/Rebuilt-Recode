@@ -12,7 +12,7 @@ import com.revrobotics.PersistMode;
 
 class IntakeIOReal implements IntakeIO {
 
-    private final SparkMax intakeMotor;
+    public SparkMax intakeMotor;
     private final RelativeEncoder encoder;
 
     IntakeIOReal() {
