@@ -1,5 +1,7 @@
 package frc.robot.util;
 
+import edu.wpi.first.math.geometry.Pose2d;
+
 public class Conversions {
 
     public static double RPSToMPS(double wheelRPS, double circumference) {
@@ -17,4 +19,9 @@ public class Conversions {
     public static double metersToRotations(double wheelMeters, double circumference) {
         return wheelMeters / circumference;
     }
+
+    public static double[] poseToArray(Pose2d pose) {
+        return new double[] {pose.getX(), pose.getY(), pose.getRotation().getDegrees()};
+    }
+    
 }

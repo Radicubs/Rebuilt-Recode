@@ -34,6 +34,8 @@ final class ShooterLogger {
         SmartDashboard.putData("Top Shooter", b -> {
             b.addDoubleProperty("Top Shooter Set Speed", shooter::getTopSetSpeed, null);
         });
+
+        SmartDashboard.putData("", shooter);
     }
     }
 

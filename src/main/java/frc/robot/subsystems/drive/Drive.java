@@ -1,6 +1,7 @@
 package frc.robot.subsystems.drive;
 
 import frc.robot.constants.DriveConstants;
+
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
@@ -19,6 +20,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.FieldConstants;
 import frc.robot.subsystems.drive.module.Module;
 import frc.robot.subsystems.gyro.Gyro;
+import frc.robot.subsystems.vision.VisionFunctions;
 
 import java.util.Optional;
 
@@ -86,6 +88,16 @@ public class Drive extends SubsystemBase {
                 },
                 this
         );
+        VisionFunctions.init(this);
+    }
+
+    /** Stop drive motor output without changing the steering setpoints. */
+    public void stop() {
+        desiredChassisSpeeds = new ChassisSpeeds();
+        for (int i = 0; i < modules.length; i++) {
+            modules[i].stop();
+            desiredModuleStates[i] = new SwerveModuleState(0.0, desiredModuleStates[i].angle);
+        }
     }
 
     public void drive(Translation2d translation, double rotation, boolean fieldRelative, boolean isOpenLoop) {

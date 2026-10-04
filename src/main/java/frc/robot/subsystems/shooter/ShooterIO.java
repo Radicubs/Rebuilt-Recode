@@ -3,11 +3,6 @@ package frc.robot.subsystems.shooter;
 import org.littletonrobotics.junction.AutoLog;
 
 interface ShooterIO {
-
-    
-
-    
-
     @AutoLog
     class ShooterIOInputs {
         public double leftVelocityRPS = 0.0;

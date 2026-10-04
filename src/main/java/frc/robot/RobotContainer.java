@@ -12,6 +12,7 @@ import frc.robot.commands.intake.SetIntakeSpeed;
 import frc.robot.commands.Transfer.SetTransferSpeed;
 import frc.robot.commands.drive.TeleopDrive;
 import frc.robot.commands.shooter.setShooterSpeed;
+import frc.robot.commands.vision.AutoAlignTag;
 import frc.robot.constants.IntakeConstants;
 import frc.robot.constants.ShooterConstants;
 import frc.robot.constants.TransferConstants;
@@ -29,8 +30,8 @@ public class RobotContainer{
     Drive drive = Drive.getInstance();
 
 
-    private CommandXboxController secondaryController = new CommandXboxController(1);
-        private CommandXboxController mainController = new CommandXboxController(0);
+    private CommandXboxController operator = new CommandXboxController(1);
+        private CommandXboxController driver = new CommandXboxController(0);
         public RobotContainer()
         {
             configureBindings();
@@ -39,23 +40,30 @@ public class RobotContainer{
     
         
         private void configureControllers() {
-            mainController = new CommandXboxController(0);
-            secondaryController = new CommandXboxController(1);
+            driver = new CommandXboxController(0);
+            operator = new CommandXboxController(1);
 
         drive.setDefaultCommand(new TeleopDrive(
-                () -> -mainController.getLeftY(),
-                () -> -mainController.getLeftX(),
-                () -> -mainController.getRightX(),
+                () -> -driver.getLeftY(),
+                () -> -driver.getLeftX(),
+                () -> -driver.getRightX(),
                 () -> false //mainController.x().getAsBoolean()
         ));
     }
     private void configureBindings() {
-        secondaryController.x().whileTrue(new SetIntakeSpeed(intake, IntakeConstants.intakeSpeedRPS));
+        operator.x().whileTrue(new SetIntakeSpeed(intake, IntakeConstants.intakeSpeedRPS));
     
-        secondaryController.rightBumper().whileTrue(
+        operator.rightBumper().whileTrue(
             new setShooterSpeed(shooter,ShooterConstants.CloseShootSpeeds.mainShooterRPS , ShooterConstants.CloseShootSpeeds.topShaftRPS, ShooterConstants.CloseShootSpeeds.indexerRPS)
                 .alongWith(new SetTransferSpeed(transfer, TransferConstants.shootTransferSpeed))
         );
+
+        driver.rightTrigger().whileTrue(new AutoAlignTag(
+            drive,
+            () -> -driver.getLeftY(),
+            () -> -driver.getLeftX(),
+            () -> -driver.getRightX()
+        ));
     }
     
     

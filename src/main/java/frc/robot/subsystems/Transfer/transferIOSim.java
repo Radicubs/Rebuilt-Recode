@@ -11,28 +11,28 @@ class transferIOSim implements transferIO {
     private static final double NOMINAL_BUS_VOLTAGE = 12.0;
 
     private final DCMotor gearbox = DCMotor.getNeo550(1);
-    private FlywheelSim transferflywheel;
-        private double appliedVolts = 0.0;
-    
-        void TransferIOSim() { 
-            LinearSystem<N1, N1, N1> transferPlant = LinearSystemId.createFlywheelSystem(gearbox, TransferConstants.SimConstants.momentOfInertiaKgMetersSquared, TransferConstants.SimConstants.gearing);
-            transferflywheel = new FlywheelSim(transferPlant, gearbox);
+    private final FlywheelSim transferflywheel;
+    private double appliedVolts = 0.0;
 
-    }    
+    transferIOSim() {
+        LinearSystem<N1, N1, N1> transferPlant = LinearSystemId.createFlywheelSystem(
+                gearbox,
+                TransferConstants.SimConstants.momentOfInertiaKgMetersSquared,
+                TransferConstants.SimConstants.gearing);
+        transferflywheel = new FlywheelSim(transferPlant, gearbox);
+    }
 
     @Override
-        public void updateInputs(transferIOInputs inputs) {
-            transferflywheel.update(0.02);
-            inputs.velocityRPS = transferflywheel.getAngularVelocityRadPerSec() / (2 * Math.PI);
-            inputs.appliedVolts = appliedVolts;
-            inputs.currentAmps = transferflywheel.getCurrentDrawAmps();
-        }
+    public void updateInputs(transferIOInputs inputs) {
+        transferflywheel.update(0.02);
+        inputs.velocityRPS = transferflywheel.getAngularVelocityRadPerSec() / (2 * Math.PI);
+        inputs.appliedVolts = appliedVolts;
+        inputs.currentAmps = transferflywheel.getCurrentDrawAmps();
+    }
 
-        @Override
-        public void DutyCycle(double dutyCycle) {
-            appliedVolts = dutyCycle * NOMINAL_BUS_VOLTAGE;
-            transferflywheel.setInputVoltage(appliedVolts);
-        }
-      
-    
+    @Override
+    public void DutyCycle(double dutyCycle) {
+        appliedVolts = dutyCycle * NOMINAL_BUS_VOLTAGE;
+        transferflywheel.setInputVoltage(appliedVolts);
+    }
 }

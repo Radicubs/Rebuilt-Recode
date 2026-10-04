@@ -6,7 +6,10 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.constants.InterpolatingConstants;
 import frc.robot.constants.ShooterConstants;
+import frc.robot.util.interpolation.InterpolatingDouble;
+import frc.robot.subsystems.vision.VisionFunctions;
 
 public class Shooter extends SubsystemBase {
 
@@ -76,6 +79,14 @@ public class Shooter extends SubsystemBase {
     public double getTopSetSpeed() {
         return ShooterConstants.CloseShootSpeeds.topShaftRPS;
     }
+
+    public double getDesiredSpeed() {
+    InterpolatingDouble interpolatedDegrees =
+        InterpolatingConstants.ShooterSpeedMap.getInterpolated(
+            new InterpolatingDouble(VisionFunctions.getHubDistanceMeters()));
+    return interpolatedDegrees.value;
+    }
+    
     private Shooter() {
         io = RobotBase.isSimulation() ? new ShooterIOSim() : new ShooterIOReal();
         
