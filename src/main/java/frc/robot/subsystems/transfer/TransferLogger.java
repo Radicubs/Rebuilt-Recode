@@ -1,4 +1,4 @@
-package frc.robot.subsystems.Transfer;
+package frc.robot.subsystems.transfer;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.constants.TransferConstants;
@@ -9,12 +9,12 @@ final class TransferLogger {
 
     private TransferLogger() {}
 
-    static void publish(transfer transfer) {
+    static void publish(Transfer transfer) {
         SmartDashboard.putData("Transfer", b ->
                 b.addDoubleProperty("Transfer Speed", transfer::getTransferVelocity, null));
     }
 
-    static void log(transfer transfer) {
+    static void log(Transfer transfer) {
         Logger.recordOutput("Transfer/Setpoint", transfer.getSetPoint());
         Logger.recordOutput("Transfer/Error", transfer.getSetPoint() - transfer.getTransferVelocity());
         Logger.recordOutput("Transfer/Active", transfer.isActive());

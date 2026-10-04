@@ -10,9 +10,10 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.commands.intake.SetIntakeSpeed;
 import frc.robot.commands.pivot.SetPivotPosition;
-import frc.robot.commands.Transfer.SetTransferSpeed;
+import frc.robot.commands.transfer.SetTransferSpeed;
 import frc.robot.commands.drive.TeleopDrive;
 import frc.robot.commands.shooter.setShooterSpeed;
+import frc.robot.commands.shooter.shootOptimizedShot;
 import frc.robot.commands.vision.AutoAlignTag;
 import frc.robot.constants.IntakeConstants;
 import frc.robot.constants.PivotConstants;
@@ -21,16 +22,17 @@ import frc.robot.constants.TransferConstants;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.pivot.Pivot;
 import frc.robot.subsystems.shooter.Shooter;
-import frc.robot.subsystems.Transfer.transfer;
+import frc.robot.subsystems.transfer.Transfer;
 import frc.robot.subsystems.drive.Drive;
 
 
 
 public class RobotContainer{
+    // Shooter dashboard getters need the field pose; Drive initializes VisionFunctions.
+    Drive drive = Drive.getInstance();
     Intake intake = Intake.getInstance();
     Shooter shooter = Shooter.getInstance();
-    transfer transfer = frc.robot.subsystems.Transfer.transfer.getInstance();
-    Drive drive = Drive.getInstance();
+    Transfer transfer = Transfer.getInstance();
     Pivot pivot = Pivot.getInstance();
 
 
@@ -63,6 +65,11 @@ public class RobotContainer{
         );
 
         operator.b().onTrue(new SetPivotPosition(pivot, PivotConstants.upPos));
+
+        operator.rightTrigger().whileTrue(new shootOptimizedShot(shooter, 20)
+            .alongWith(new SetTransferSpeed(transfer, TransferConstants.shootTransferSpeed))
+        );
+
 
         driver.rightTrigger().whileTrue(new AutoAlignTag(
             drive,

@@ -80,11 +80,18 @@ public class Shooter extends SubsystemBase {
         return ShooterConstants.CloseShootSpeeds.topShaftRPS;
     }
 
-    public double getDesiredSpeed() {
-    InterpolatingDouble interpolatedDegrees =
-        InterpolatingConstants.ShooterSpeedMap.getInterpolated(
-            new InterpolatingDouble(VisionFunctions.getHubDistanceMeters()));
-    return interpolatedDegrees.value;
+    public double getTopDesiredSpeed() {
+        InterpolatingDouble interpolatedDegrees =
+            InterpolatingConstants.topShooterSpeedMap.getInterpolated(
+                new InterpolatingDouble(VisionFunctions.getHubDistanceMeters()));
+        return interpolatedDegrees.value;
+    }
+
+    public double getMainDesiredSpeed() {
+        InterpolatingDouble interpolatedDegrees =
+            InterpolatingConstants.mainShooterSpeedMap.getInterpolated(
+                new InterpolatingDouble(VisionFunctions.getHubDistanceMeters()));
+        return interpolatedDegrees.value;
     }
     
     private Shooter() {

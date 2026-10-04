@@ -1,6 +1,4 @@
-package frc.robot.subsystems.Transfer;
-
-import org.littletonrobotics.junction.AutoLog;
+package frc.robot.subsystems.transfer;
 
 import com.revrobotics.PersistMode;
 import com.revrobotics.RelativeEncoder;
@@ -9,14 +7,13 @@ import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
-import edu.wpi.first.wpilibj.Encoder;
 import frc.robot.constants.TransferConstants;
 
-public class transferIOReal implements transferIO {
+public class TransferIOReal implements TransferIO {
     private SparkMax transferMotor;
     private RelativeEncoder transferEncoder;
 
-    transferIOReal() {
+    TransferIOReal() {
         SparkMaxConfig config = new SparkMaxConfig();
         config.inverted(false);
         config.idleMode(IdleMode.kCoast);
@@ -29,7 +26,7 @@ public class transferIOReal implements transferIO {
         }
 
         @Override
-        public void updateInputs(transferIOInputs inputs) {
+        public void updateInputs(TransferIOInputs inputs) {
             inputs.velocityRPS = (transferEncoder).getVelocity() / 60.0;
             inputs.appliedVolts = transferMotor.getAppliedOutput() * transferMotor.getBusVoltage();
             inputs.currentAmps = transferMotor.getOutputCurrent();

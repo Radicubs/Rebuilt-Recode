@@ -1,14 +1,14 @@
-package frc.robot.commands.Transfer;
+package frc.robot.commands.transfer;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.Transfer.transfer;
+import frc.robot.subsystems.transfer.Transfer;
 
 public class SetTransferSpeed extends Command {
 
-    private transfer transfer;
+    private Transfer transfer;
     private double targetSpeed;
     
-    public SetTransferSpeed(transfer transfer, double targetSpeed) {
+    public SetTransferSpeed(Transfer transfer, double targetSpeed) {
         this.transfer = transfer;
         this.targetSpeed = targetSpeed;
         addRequirements(transfer);

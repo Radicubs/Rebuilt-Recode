@@ -1,4 +1,4 @@
-package frc.robot.subsystems.Transfer;
+package frc.robot.subsystems.transfer;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -15,8 +15,8 @@ class TransferIOSimTest {
 
     @Test
     void updatesImmediatelyAfterConstructionWithoutMotorInput() {
-        var io = new transferIOSim();
-        var inputs = new transferIO.transferIOInputs();
+        var io = new TransferIOSim();
+        var inputs = new TransferIO.TransferIOInputs();
 
         io.updateInputs(inputs);
 
@@ -28,8 +28,8 @@ class TransferIOSimTest {
     @Test
     void motorInputProducesMotionInBothDirections() {
         for (double dutyCycle : new double[] {0.5, -0.5}) {
-            var io = new transferIOSim();
-            var inputs = new transferIO.transferIOInputs();
+            var io = new TransferIOSim();
+            var inputs = new TransferIO.TransferIOInputs();
             io.DutyCycle(dutyCycle);
 
             for (int i = 0; i < 10; i++) {

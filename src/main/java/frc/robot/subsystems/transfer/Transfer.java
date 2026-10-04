@@ -1,34 +1,34 @@
-package frc.robot.subsystems.Transfer;
+package frc.robot.subsystems.transfer;
 
 import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.TransferConstants;
-import frc.robot.subsystems.Transfer.transferIO.transferIOInputs;
 
-public class transfer extends SubsystemBase {
-    private static transfer INSTANCE;
-    private final transferIOInputsAutoLogged inputs = new transferIOInputsAutoLogged();
+public class Transfer extends SubsystemBase {
+    private static Transfer INSTANCE;
+    private final TransferIOInputsAutoLogged inputs = new TransferIOInputsAutoLogged();
     private final PIDController transferConroller;
     private final SimpleMotorFeedforward transferFeedforward;
     private boolean goToTransferTarget = false;
-    private final transferIO io;
+    private final TransferIO io;
     
 
     //singleton
-    public static transfer getInstance() {
+    public static Transfer getInstance() {
         if (INSTANCE == null) {
-            INSTANCE = new transfer();
+            INSTANCE = new Transfer();
         }
         return INSTANCE;
     }
 
-    private transfer() {
+    private Transfer() {
 
-        io = RobotBase.isSimulation() ? new transferIOSim() : new transferIOReal();
+        io = RobotBase.isSimulation() ? new TransferIOSim() : new TransferIOReal();
 
         transferConroller = new PIDController(
             TransferConstants.TransferPIDFeedforwardConstants.kP,
@@ -68,6 +68,8 @@ public class transfer extends SubsystemBase {
 
     public void cancelPID() {
         goToTransferTarget = false;
+        transferConroller.reset();
+        io.DutyCycle(0.0);
     }
     
 
@@ -79,7 +81,7 @@ public class transfer extends SubsystemBase {
             double pidOutput = transferConroller.calculate(inputs.velocityRPS);
             double feedforwardOutput = transferFeedforward.calculate(transferConroller.getSetpoint());
             double totalOutput = pidOutput + feedforwardOutput;
-            io.DutyCycle(totalOutput / 12.0);
+            io.DutyCycle(MathUtil.clamp(totalOutput / 12.0, -1.0, 1.0));
             
         } 
         else {
