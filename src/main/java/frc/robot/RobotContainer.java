@@ -9,14 +9,17 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.commands.intake.SetIntakeSpeed;
+import frc.robot.commands.pivot.SetPivotPosition;
 import frc.robot.commands.Transfer.SetTransferSpeed;
 import frc.robot.commands.drive.TeleopDrive;
 import frc.robot.commands.shooter.setShooterSpeed;
 import frc.robot.commands.vision.AutoAlignTag;
 import frc.robot.constants.IntakeConstants;
+import frc.robot.constants.PivotConstants;
 import frc.robot.constants.ShooterConstants;
 import frc.robot.constants.TransferConstants;
 import frc.robot.subsystems.intake.Intake;
+import frc.robot.subsystems.pivot.Pivot;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.Transfer.transfer;
 import frc.robot.subsystems.drive.Drive;
@@ -28,6 +31,7 @@ public class RobotContainer{
     Shooter shooter = Shooter.getInstance();
     transfer transfer = frc.robot.subsystems.Transfer.transfer.getInstance();
     Drive drive = Drive.getInstance();
+    Pivot pivot = Pivot.getInstance();
 
 
     private CommandXboxController operator = new CommandXboxController(1);
@@ -57,6 +61,8 @@ public class RobotContainer{
             new setShooterSpeed(shooter,ShooterConstants.CloseShootSpeeds.mainShooterRPS , ShooterConstants.CloseShootSpeeds.topShaftRPS, ShooterConstants.CloseShootSpeeds.indexerRPS)
                 .alongWith(new SetTransferSpeed(transfer, TransferConstants.shootTransferSpeed))
         );
+
+        operator.b().onTrue(new SetPivotPosition(pivot, PivotConstants.upPos));
 
         driver.rightTrigger().whileTrue(new AutoAlignTag(
             drive,
