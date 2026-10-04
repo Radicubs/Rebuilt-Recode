@@ -17,8 +17,11 @@ class ModuleIOSim implements ModuleIO {
     private final DCMotorSim driveSim;
     private final DCMotorSim angleSim;
 
-    private final SimpleMotorFeedforward driveFeedForward =
-            new SimpleMotorFeedforward(DriveConstants.driveKS, DriveConstants.driveKV, DriveConstants.driveKA);
+    // The ideal motor plant has no static friction. Match its free speed rather than
+    // applying real-robot characterization to a different simulated plant.
+    private final SimpleMotorFeedforward driveFeedForward = new SimpleMotorFeedforward(
+            0.0, 12.0 / (DCMotor.getKrakenX60(1).freeSpeedRadPerSec
+                    / DriveConstants.driveGearRatio * DriveConstants.wheelCircumference / (2.0 * Math.PI)));
     private final PIDController driveController =
             new PIDController(DriveConstants.driveKP, DriveConstants.driveKI, DriveConstants.driveKD);
     private final PIDController angleController =

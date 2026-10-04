@@ -78,7 +78,8 @@ public final class DriveConstants {
 
     /* Swerve Profiling Values */
     /** Meters per Second */
-    public static final double maxSpeed = 0.5; //TODO: This must be tuned to specific robot
+    public static final double maxSpeed = 3.0; // Match the default PathPlanner velocity limit.
+    public static final double joystickDeadband = 0.08;
     /** Radians per Second */
     public static final double maxAngularVelocity = 2; //TODO: This must be tuned to specific robot
 

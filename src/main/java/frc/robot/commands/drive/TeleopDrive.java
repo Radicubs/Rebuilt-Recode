@@ -51,10 +51,11 @@ public class TeleopDrive extends Command {
         prevToggle = toggle;
 
         // Any manual rotation cancels lock-on.
-        if (rotation.getAsDouble() != 0) {lockOn = false;}
+        double rotationInput = MathUtil.applyDeadband(rotation.getAsDouble(), DriveConstants.joystickDeadband);
+        if (rotationInput != 0) {lockOn = false;}
 
         Optional<Rotation2d> target = lockOn ? drive.getHeadingToHub() : Optional.empty();
-        double rotSpeed = rotation.getAsDouble();
+        double rotSpeed = rotationInput;
         if (target.isPresent()) {
             rotSpeed = MathUtil.clamp(
                     lockOnPID.calculate(drive.getHeading().getRadians(), target.get().getRadians()),
@@ -66,8 +67,8 @@ public class TeleopDrive extends Command {
                 && DriverStation.getAlliance().get() == DriverStation.Alliance.Red;
         double sign = isRed ? -1.0 : 1.0;
         drive.drive(
-                new Translation2d(sign * translationX.getAsDouble() * DriveConstants.maxSpeed,
-                        sign * translationY.getAsDouble() * DriveConstants.maxSpeed),
+                new Translation2d(sign * MathUtil.applyDeadband(translationX.getAsDouble(), DriveConstants.joystickDeadband) * DriveConstants.maxSpeed,
+                        sign * MathUtil.applyDeadband(translationY.getAsDouble(), DriveConstants.joystickDeadband) * DriveConstants.maxSpeed),
                 rotSpeed * DriveConstants.maxAngularVelocity,
                 true,
                 false);

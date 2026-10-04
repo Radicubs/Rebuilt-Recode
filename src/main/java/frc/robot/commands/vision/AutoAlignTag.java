@@ -23,7 +23,6 @@ public class AutoAlignTag extends Command {
   private final Drive drivetrain;
   private final DoubleSupplier translationX;
   private final DoubleSupplier translationY;
-  private final DoubleSupplier rotation;
   private final boolean finishWhenAligned;
   private final PIDController aimController = new PIDController(DriveConstants.lockKP, 0.0, 0.0);
 
@@ -31,21 +30,20 @@ public class AutoAlignTag extends Command {
 
   /** Stationary alignment command that finishes when aligned. */
   public AutoAlignTag(Drive drivetrain) {
-    this(drivetrain, () -> 0.0, () -> 0.0, () -> 0.0, true);
+    this(drivetrain, () -> 0.0, () -> 0.0, true);
   }
 
-  /** Hold-to-align command. Inputs are normalized joystick axes, matching TeleopDrive. */
+  /** Hold-to-align command. Joysticks control translation; alignment owns rotation. */
   public AutoAlignTag(Drive drivetrain, DoubleSupplier translationX,
-      DoubleSupplier translationY, DoubleSupplier rotation) {
-    this(drivetrain, translationX, translationY, rotation, false);
+      DoubleSupplier translationY) {
+    this(drivetrain, translationX, translationY, false);
   }
 
   private AutoAlignTag(Drive drivetrain, DoubleSupplier translationX,
-      DoubleSupplier translationY, DoubleSupplier rotation, boolean finishWhenAligned) {
+      DoubleSupplier translationY, boolean finishWhenAligned) {
     this.drivetrain = drivetrain;
     this.translationX = translationX;
     this.translationY = translationY;
-    this.rotation = rotation;
     this.finishWhenAligned = finishWhenAligned;
     aimController.enableContinuousInput(-Math.PI, Math.PI);
     addRequirements(drivetrain);
@@ -66,31 +64,26 @@ public class AutoAlignTag extends Command {
     Rotation2d headingError = targetHeading.minus(robotPose.getRotation());
     aligned = Math.abs(headingError.getDegrees()) <= ALIGNMENT_TOLERANCE_DEGREES;
 
-    double rotationInput = rotation.getAsDouble();
-    boolean aiming = rotationInput == 0.0;
-    if (aiming) {
-      rotationInput = MathUtil.clamp(
+    // This command requires the drivetrain, suspending TeleopDrive while active.
+    // Always use alignment rotation, even when the driver moves the right stick.
+    double rotationInput = MathUtil.clamp(
           aimController.calculate(robotPose.getRotation().getRadians(), targetHeading.getRadians()),
           -DriveConstants.lockOnMaxSpeed, DriveConstants.lockOnMaxSpeed);
-      // Keep small corrections until aligned; an output deadband would stop short of the tolerance.
-      if (aligned) {
-        rotationInput = 0.0;
-      }
-    } else {
-      // Manual rotation takes priority; resume tracking when the stick returns to zero.
-      aimController.reset();
+    // Keep small corrections until aligned; an output deadband would stop short of the tolerance.
+    if (aligned) {
+      rotationInput = 0.0;
     }
 
     double allianceSign = FieldManager.isRedAlliance() ? -1.0 : 1.0;
     drivetrain.drive(
         new Translation2d(
-            allianceSign * translationX.getAsDouble() * DriveConstants.maxSpeed,
-            allianceSign * translationY.getAsDouble() * DriveConstants.maxSpeed),
+            allianceSign * MathUtil.applyDeadband(translationX.getAsDouble(), DriveConstants.joystickDeadband) * DriveConstants.maxSpeed,
+            allianceSign * MathUtil.applyDeadband(translationY.getAsDouble(), DriveConstants.joystickDeadband) * DriveConstants.maxSpeed),
         rotationInput * DriveConstants.maxAngularVelocity,
         true,
         false);
 
-    Logger.recordOutput("Drive/RotToTag/Active", aiming);
+    Logger.recordOutput("Drive/RotToTag/Active", true);
     Logger.recordOutput("Drive/RotToTag/Aligned", aligned);
     Logger.recordOutput("Drive/RotToTag/TargetPose", targetPose);
     Logger.recordOutput("Drive/RotToTag/TargetAngleRad", targetHeading.getRadians());

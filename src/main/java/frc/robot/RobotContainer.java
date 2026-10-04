@@ -61,8 +61,7 @@ public class RobotContainer{
         driver.rightTrigger().whileTrue(new AutoAlignTag(
             drive,
             () -> -driver.getLeftY(),
-            () -> -driver.getLeftX(),
-            () -> -driver.getRightX()
+            () -> -driver.getLeftX()
         ));
     }
     
