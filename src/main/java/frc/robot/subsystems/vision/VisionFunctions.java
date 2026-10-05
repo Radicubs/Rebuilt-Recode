@@ -1,8 +1,12 @@
 package frc.robot.subsystems.vision;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.constants.VisionConstants;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.util.FieldManager;
 
@@ -12,11 +16,9 @@ import java.util.Optional;
 
 public class VisionFunctions extends SubsystemBase {
 
-  private static final Pose2d ZERO_POSE = new Pose2d();
   private static final int RED_HUB_TAG_ID = 10;
   private static final int BLUE_HUB_TAG_ID = 26;
-  private static final double MIN_SHOOTING_DISTANCE_METERS = 1.95;
-  private static final double MAX_SHOOTING_DISTANCE_METERS = 2.075;
+
 
   private static VisionFunctions instance;
 
@@ -51,9 +53,16 @@ public class VisionFunctions extends SubsystemBase {
     return getInstance().vision.getBestTagId() != -1;
   }
 
+  public static Pose2d getHubTargetPose() {
+    Pose2d tagPose = FieldManager.getTagPose(getHubTagId());
+    // Tag-relative negative X points inward on both alliances.
+    return tagPose.plus(
+        new Transform2d(new Translation2d(-VisionConstants.HUB_OFFSET_METERS, 0.0), Rotation2d.kZero));
+  }
+
   public static double getHubDistanceMeters() {
-    Pose2d hubTag = FieldManager.getTagPose(getHubTagId());
-    return hubTag.getTranslation().getDistance(getInstance().drivetrain.getPose().getTranslation());
+    return getHubTargetPose().getTranslation()
+        .getDistance(getInstance().drivetrain.getPose().getTranslation());
   }
 
 }
