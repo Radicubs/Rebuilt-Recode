@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.commands.intake.SetIntakeSpeed;
 import frc.robot.commands.pivot.SetPivotPosition;
+import frc.robot.commands.pivot.ShakePivot;
 import frc.robot.commands.Transfer.SetTransferSpeed;
 import frc.robot.commands.drive.TeleopDrive;
 import frc.robot.commands.shooter.setShooterSpeed;
@@ -55,14 +56,19 @@ public class RobotContainer{
         ));
     }
     private void configureBindings() {
-        operator.x().whileTrue(new SetIntakeSpeed(intake, IntakeConstants.intakeSpeedRPS));
+        operator.x().whileTrue(new SetIntakeSpeed(intake, IntakeConstants.intakeSpeedRPS).alongWith(new SetTransferSpeed(transfer, TransferConstants.intakeTransferSpeed)));
     
-        operator.rightBumper().whileTrue(
-            new setShooterSpeed(shooter,ShooterConstants.CloseShootSpeeds.mainShooterRPS , ShooterConstants.CloseShootSpeeds.topShaftRPS, ShooterConstants.CloseShootSpeeds.indexerRPS)
-                .alongWith(new SetTransferSpeed(transfer, TransferConstants.shootTransferSpeed))
-        );
+        operator.rightBumper().whileTrue(new setShooterSpeed(shooter,ShooterConstants.CloseShootSpeeds.mainShooterRPS , ShooterConstants.CloseShootSpeeds.topShaftRPS, ShooterConstants.CloseShootSpeeds.indexerRPS).alongWith(new SetTransferSpeed(transfer, TransferConstants.shootTransferSpeed)).alongWith(new ShakePivot(pivot)).repeatedly());
 
-        operator.b().onTrue(new SetPivotPosition(pivot, PivotConstants.upPos));
+        operator.rightTrigger().whileTrue(new setShooterSpeed(shooter, ShooterConstants.TrenchShootSpeeds.mainShooterRPS, ShooterConstants.TrenchShootSpeeds.topShaftRPS, ShooterConstants.TrenchShootSpeeds.indexerRPS).alongWith(new SetTransferSpeed(transfer, TransferConstants.shootTransferSpeed)).alongWith(new ShakePivot(pivot)).repeatedly());
+
+        operator.leftTrigger().whileTrue(new setShooterSpeed(shooter, ShooterConstants.PassSpeeds.mainShooterRPS, ShooterConstants.PassSpeeds.topShaftRPS, ShooterConstants.PassSpeeds.indexerRPS).alongWith(new SetTransferSpeed(transfer, TransferConstants.shootTransferSpeed)).alongWith(new ShakePivot(pivot)).repeatedly());
+
+        operator.leftBumper().whileTrue(new setShooterSpeed(shooter, ShooterConstants.EjectSpeeds.mainShooterRPS, ShooterConstants.EjectSpeeds.topShaftRPS, ShooterConstants.EjectSpeeds.indexerRPS).alongWith(new SetTransferSpeed(transfer, TransferConstants.shootTransferSpeed)).alongWith(new ShakePivot(pivot)).repeatedly());
+
+        operator.povUp().onTrue(new SetPivotPosition(pivot, PivotConstants.upPos));
+
+        operator.povDown().onTrue(new SetPivotPosition(pivot, PivotConstants.downPos));
 
         driver.rightTrigger().whileTrue(new AutoAlignTag(
             drive,

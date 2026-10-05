@@ -20,17 +20,17 @@ public final class ShooterConstants
     public static final boolean shooterEnableCurrentLimit = true;
 
     public static final class CloseShootSpeeds{
-        public static double mainShooterRPS = 100; 
-        public static final double topShaftRPS = 40; 
+        public static double mainShooterRPS = 47; 
+        public static final double topShaftRPS = 2; 
         public static final double indexerRPS = 20; 
     }
     public static final class TrenchShootSpeeds{
-        public static double mainShooterRPS = 60; 
+        public static double mainShooterRPS = 55; 
         public static final double topShaftRPS = 10; 
         public static final double indexerRPS = 20; 
     }
     public static final class PassSpeeds{
-        public static double mainShooterRPS = 30; 
+        public static double mainShooterRPS = 60; 
         public static final double topShaftRPS = 20; 
         public static final double indexerRPS = 20; 
     }
