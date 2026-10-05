@@ -4,10 +4,10 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.constants.DriveConstants;
+import frc.robot.constants.VisionConstants;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.vision.VisionFunctions;
 import frc.robot.util.FieldManager;
@@ -17,14 +17,11 @@ import org.littletonrobotics.junction.Logger;
 /** Aims the rear-facing shooter at the alliance hub, optionally while driving. */
 public class AutoAlignTag extends Command {
 
-  private static final double HUB_OFFSET_METERS = 0.60365;
-  private static final double ALIGNMENT_TOLERANCE_DEGREES = 0.2;
-
   private final Drive drivetrain;
   private final DoubleSupplier translationX;
   private final DoubleSupplier translationY;
   private final boolean finishWhenAligned;
-  private final PIDController aimController = new PIDController(DriveConstants.lockKP, 0.0, 0.0);
+  private final PIDController aimController = new PIDController(VisionConstants.lockKP, 0.0, 0.0);
 
   private boolean aligned;
 
@@ -62,13 +59,13 @@ public class AutoAlignTag extends Command {
     Rotation2d targetHeading = targetPose.getTranslation()
         .minus(robotPose.getTranslation()).getAngle().plus(Rotation2d.k180deg);
     Rotation2d headingError = targetHeading.minus(robotPose.getRotation());
-    aligned = Math.abs(headingError.getDegrees()) <= ALIGNMENT_TOLERANCE_DEGREES;
+    aligned = Math.abs(headingError.getDegrees()) <= VisionConstants.ALIGNMENT_TOLERANCE_DEGREES;
 
     // This command requires the drivetrain, suspending TeleopDrive while active.
     // Always use alignment rotation, even when the driver moves the right stick.
     double rotationInput = MathUtil.clamp(
           aimController.calculate(robotPose.getRotation().getRadians(), targetHeading.getRadians()),
-          -DriveConstants.lockOnMaxSpeed, DriveConstants.lockOnMaxSpeed);
+          -VisionConstants.lockOnMaxSpeed, VisionConstants.lockOnMaxSpeed);
     // Keep small corrections until aligned; an output deadband would stop short of the tolerance.
     if (aligned) {
       rotationInput = 0.0;
@@ -102,9 +99,6 @@ public class AutoAlignTag extends Command {
   }
 
   private Pose2d getTargetPose() {
-    Pose2d tagPose = FieldManager.getTagPose(VisionFunctions.getHubTagId());
-    // Tag-relative negative X points inward on both alliances.
-    return tagPose.plus(
-        new Transform2d(new Translation2d(-HUB_OFFSET_METERS, 0.0), Rotation2d.kZero));
+    return VisionFunctions.getHubTargetPose();
   }
 }

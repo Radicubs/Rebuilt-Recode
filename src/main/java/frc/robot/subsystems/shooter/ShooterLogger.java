@@ -3,10 +3,9 @@ package frc.robot.subsystems.shooter;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 final class ShooterLogger {
-    
     private ShooterLogger() {}
 
-        static void publish(Shooter shooter) {
+    static void publish(Shooter shooter) {
         SmartDashboard.putData("Right Shooter", b ->
                 b.addDoubleProperty("Right Shooter Speed", shooter::getRightShooterSpeed, null));
 
@@ -35,9 +34,12 @@ final class ShooterLogger {
             b.addDoubleProperty("Top Shooter Set Speed", shooter::getTopSetSpeed, null);
         });
 
-        SmartDashboard.putData("", shooter);
-    }
-    }
+        SmartDashboard.putData("Main Shooter", b -> {
+            b.addDoubleProperty("Main Shooter Desired Speed", shooter::getMainDesiredSpeed, null);
+        });
 
-       
-
+        SmartDashboard.putData("Top Shooter", b -> {
+            b.addDoubleProperty("Top Shooter Desired Speed", shooter::getTopDesiredSpeed, null);
+        });
+    }
+}

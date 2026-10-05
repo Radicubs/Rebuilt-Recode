@@ -1,21 +1,19 @@
-package frc.robot.subsystems.Transfer;
+package frc.robot.subsystems.transfer;
 
 import org.littletonrobotics.junction.AutoLog;
 
-import edu.wpi.first.wpilibj.DutyCycle;
-
-interface transferIO {
+interface TransferIO {
 
     
     @AutoLog
-    class transferIOInputs {
+    class TransferIOInputs {
         public double velocityRPS = 0.0;
         public double appliedVolts = 0.0;
         public double currentAmps = 0.0;
     }
     
 
-    default void updateInputs(transferIOInputs inputs) {}
+    default void updateInputs(TransferIOInputs inputs) {}
     default void DutyCycle(double dutyCycle) {}
     
 

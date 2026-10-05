@@ -54,11 +54,6 @@ public final class DriveConstants {
     public static final double angleKI = chosenModule.angleKI;
     public static final double angleKD = chosenModule.angleKD;
 
-    /* Lock on values*/
-    public static final double lockKP = 0.9; //TODO: This must be tuned to specific robot
-    public static final double lockDeadband = 0.025;
-    public static final double lockOnMaxSpeed = 2;
-
     /* Angle Motor Magic Motion Values */
     public static final double magicMotionAccel = 18;
     public static final double magicMotionJerk = 130;

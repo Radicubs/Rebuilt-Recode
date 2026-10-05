@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.constants.DriveConstants;
+import frc.robot.constants.VisionConstants;
 import org.littletonrobotics.junction.Logger;
 
 import java.util.Optional;
@@ -34,7 +35,7 @@ public class TeleopDrive extends Command {
         this.toggleLockOn = toggleLockOn;
 
         drive = Drive.getInstance();
-        lockOnPID = new PIDController(DriveConstants.lockKP, 0, 0);
+        lockOnPID = new PIDController(VisionConstants.lockKP, 0, 0);
         lockOnPID.enableContinuousInput(-Math.PI, Math.PI);
         addRequirements(drive);
     }
@@ -59,8 +60,8 @@ public class TeleopDrive extends Command {
         if (target.isPresent()) {
             rotSpeed = MathUtil.clamp(
                     lockOnPID.calculate(drive.getHeading().getRadians(), target.get().getRadians()),
-                    -DriveConstants.lockOnMaxSpeed, DriveConstants.lockOnMaxSpeed);
-            if (Math.abs(rotSpeed) < DriveConstants.lockDeadband) {rotSpeed = 0;}
+                    -VisionConstants.lockOnMaxSpeed, VisionConstants.lockOnMaxSpeed);
+            if (Math.abs(rotSpeed) < VisionConstants.lockDeadband) {rotSpeed = 0;}
         }
 
         boolean isRed = DriverStation.getAlliance().isPresent()
