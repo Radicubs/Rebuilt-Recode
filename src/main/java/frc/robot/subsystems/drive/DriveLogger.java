@@ -2,6 +2,8 @@ package frc.robot.subsystems.drive;
 
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.util.Conversions;
+
 import org.littletonrobotics.junction.Logger;
 
 final class DriveLogger {
@@ -19,6 +21,7 @@ final class DriveLogger {
     void log(Drive drive) {
         field.setRobotPose(drive.getPose());
         Logger.recordOutput("Drive/Pose", drive.getPose());
+        Logger.recordOutput("Drive/Pose Array", Conversions.poseToArray(drive.getPose()));
         Logger.recordOutput("Drive/Heading", drive.getHeading());
         Logger.recordOutput("Drive/GyroYaw", drive.getGyroYaw());
         Logger.recordOutput("Drive/ModuleStates", drive.getModuleStates());

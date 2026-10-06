@@ -5,17 +5,17 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.pivot.Pivot;
 import frc.robot.constants.PivotConstants;
 
-public class ShakePivot extends Command {
+public class FoldPivotWhileShooting extends Command {
 
-    private static final double SHAKE_AMPLITUDE = 0.02; 
-    private static final double TOGGLE_PERIOD = 0.1;    
-    private static final double DURATION = 5.0;         
+   private static final double FOLD_SPEED_RATE = 0.05; 
 
     private final Pivot pivot;
+    private final double degrees;
     private final Timer timer = new Timer();
 
-    public ShakePivot(Pivot pivot) {
+    public FoldPivotWhileShooting(Pivot pivot, double degrees) {
         this.pivot = pivot;
+        this.degrees = degrees;
         addRequirements(pivot);
     }
 
@@ -26,9 +26,9 @@ public class ShakePivot extends Command {
 
     @Override
     public void execute() {
-        double sign = (((int) (timer.get() / TOGGLE_PERIOD)) % 2) == 1 ? 1.0 : -1.0;
+        double elapsedTime = timer.get();
         
-        double targetPosition = PivotConstants.middlePos + (sign * SHAKE_AMPLITUDE);
+        double targetPosition = degrees - (elapsedTime * FOLD_SPEED_RATE);
         
         double minLimit = Math.min(PivotConstants.upPos, PivotConstants.downPos);
         double maxLimit = Math.max(PivotConstants.upPos, PivotConstants.downPos);
@@ -39,9 +39,9 @@ public class ShakePivot extends Command {
 
     @Override
     public boolean isFinished() {
-        return timer.hasElapsed(DURATION);
+        return false;
     }
-    
+
     @Override
     public void end(boolean interrupted) {
         pivot.setGoal(PivotConstants.downPos);
