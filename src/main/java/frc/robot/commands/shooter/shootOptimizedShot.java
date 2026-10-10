@@ -2,6 +2,7 @@ package frc.robot.commands.shooter;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.commands.pivot.MovePivotUntilStall;
 import frc.robot.commands.vision.AutoAlignTag;
 import frc.robot.constants.ShooterConstants;
 import frc.robot.constants.PivotConstants;
@@ -84,6 +85,7 @@ public class shootOptimizedShot extends Command {
         }
         wheelsLocked = false;
         SmartDashboard.putBoolean("Wheels Locked?", wheelsLocked);
+        new MovePivotUntilStall(pivot, 0.2).schedule();
     }
 
     @Override
