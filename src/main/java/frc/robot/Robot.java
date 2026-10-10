@@ -45,24 +45,7 @@ public class Robot extends LoggedRobot
     public void robotPeriodic()
     {
         CommandScheduler.getInstance().run();
-        logCANStatus();
-    }
-
-    private void logCANStatus() {
-        var status = RobotController.getCANStatus();
-        double utilizationPercent = status.percentBusUtilization * 100.0;
-        SmartDashboard.putNumber("CAN/UtilizationPercent", utilizationPercent);
-        SmartDashboard.putNumber("CAN/BusOffCount", status.busOffCount);
-        SmartDashboard.putNumber("CAN/TxFullCount", status.txFullCount);
-        SmartDashboard.putNumber("CAN/ReceiveErrorCount", status.receiveErrorCount);
-        SmartDashboard.putNumber("CAN/TransmitErrorCount", status.transmitErrorCount);
-        Logger.recordOutput("CAN/UtilizationPercent", utilizationPercent);
-        Logger.recordOutput("CAN/BusOffCount", status.busOffCount);
-        Logger.recordOutput("CAN/TxFullCount", status.txFullCount);
-        Logger.recordOutput("CAN/ReceiveErrorCount", status.receiveErrorCount);
-        Logger.recordOutput("CAN/TransmitErrorCount", status.transmitErrorCount);
-    }
-    
+    }  
     
     @Override
     public void disabledInit() {}
