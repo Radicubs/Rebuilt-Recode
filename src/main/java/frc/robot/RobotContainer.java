@@ -131,18 +131,16 @@ public class RobotContainer {
         operator.y().whileTrue(
                 new setShooterSpeed(shooter, ShooterConstants.TrenchShootSpeeds.mainShooterRPS,
                         ShooterConstants.TrenchShootSpeeds.topShaftRPS,
-                        ShooterConstants.TrenchShootSpeeds.indexerRPS, true)
-                        .alongWith(new SetTransferSpeed(transfer, TransferConstants.shootTransferSpeed,
-                                () -> shooter.getIndexerSetSpeed() > 0.0))
-                        .alongWith(new FoldPivotWhileShooting(pivot, PivotConstants.foldSpeed)));
+                        ShooterConstants.TrenchShootSpeeds.indexerRPS)
+                        .alongWith(new SetTransferSpeed(transfer, TransferConstants.shootTransferSpeed))
+        );
 
         operator.x().whileTrue(
                 new setShooterSpeed(shooter, ShooterConstants.CloseShootSpeeds.mainShooterRPS,
                         ShooterConstants.CloseShootSpeeds.topShaftRPS,
-                        ShooterConstants.CloseShootSpeeds.indexerRPS, true)
-                        .alongWith(new SetTransferSpeed(transfer, TransferConstants.shootTransferSpeed,
-                                () -> shooter.getIndexerSetSpeed() > 0.0))
-                        .alongWith(new FoldPivotWhileShooting(pivot, PivotConstants.foldSpeed)));
+                        ShooterConstants.CloseShootSpeeds.indexerRPS)
+                        .alongWith(new SetTransferSpeed(transfer, TransferConstants.shootTransferSpeed))
+        );
 
         driver.rightTrigger().whileTrue(
                 new shootOptimizedShot(shooter, transfer, pivot, drive,

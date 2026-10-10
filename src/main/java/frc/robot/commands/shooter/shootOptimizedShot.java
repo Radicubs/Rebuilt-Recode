@@ -42,13 +42,13 @@ public class shootOptimizedShot extends Command {
         shooter.setOptimizedShotRPS(0.0);
         transfer.cancelPID();
         SmartDashboard.putBoolean("Wheels Locked?", false);
-        foldPivot();
+        // foldPivot();
         alignment.initialize();
     }
 
     @Override
     public void execute() {
-        foldPivot();
+        // foldPivot();
         if (!wheelsLocked) {
             alignment.execute();
             if (alignment.isAligned()) {
@@ -68,16 +68,16 @@ public class shootOptimizedShot extends Command {
         SmartDashboard.putBoolean("Wheels Locked?", wheelsLocked);
     }
 
-    private void foldPivot() {
-        reachedFoldPosition |= pivot.getPosition() <= PivotConstants.shotFoldPosition;
-        pivot.setSpeed(reachedFoldPosition ? 0.0 : PivotConstants.foldSpeed);
-    }
+    // private void foldPivot() {
+    //     reachedFoldPosition |= pivot.getPosition() <= PivotConstants.shotFoldPosition;
+    //     pivot.setSpeed(reachedFoldPosition ? 0.0 : PivotConstants.foldSpeed);
+    // }
 
     @Override
     public void end(boolean interrupted) {
         shooter.stop();
         transfer.cancelPID();
-        pivot.setSpeed(0.0);
+        // pivot.setSpeed(0.0);
         if (!wheelsLocked) {
             alignment.end(interrupted);
         } else {
@@ -85,8 +85,8 @@ public class shootOptimizedShot extends Command {
         }
         wheelsLocked = false;
         SmartDashboard.putBoolean("Wheels Locked?", wheelsLocked);
-        new MovePivotUntilStall(pivot, 0.2).schedule();
-    }
+        // new MovePivotUntilStall(pivot, 0.2).schedule();
+    }  
 
     @Override
     public boolean isFinished() {
