@@ -55,23 +55,25 @@ public class RobotContainer {
     }
 
     private void registerNamedCommands() {
-        // ---- Shooter / transfer ----
         // Ramp the flywheels (indexer held back at -3, no belt).
         NamedCommands.registerCommand("Ramp Close Shot",
-                new shootOptimizedShot(shooter, transfer, pivot, drive,
-                        () -> -driver.getLeftY(), () -> -driver.getLeftX()));
+                Commands.runEnd(() -> { shooter.setOptimizedShotRPS(-3.0); transfer.cancelPID(); },
+                        shooter::stop, shooter, transfer));
         NamedCommands.registerCommand("Ramp Trench Shot",
-                new shootOptimizedShot(shooter, transfer, pivot, drive,
-                        () -> -driver.getLeftY(), () -> -driver.getLeftX()));
+                Commands.runEnd(() -> { shooter.setOptimizedShotRPS(-3.0); transfer.cancelPID(); },
+                        shooter::stop, shooter, transfer));
         // Full shot: flywheels + indexer + belt.
         NamedCommands.registerCommand("Start Close Shot",
-                new shootOptimizedShot(shooter, transfer, pivot, drive,
-                        () -> -driver.getLeftY(), () -> -driver.getLeftX()));
+                Commands.runEnd(() -> shooter.setOptimizedShotRPS(ShooterConstants.CloseShootSpeeds.indexerRPS),
+                        shooter::stop, shooter)
+                        .alongWith(new SetTransferSpeed(transfer, TransferConstants.shootTransferSpeed))
+                        .withTimeout(6.0));
 
 
         NamedCommands.registerCommand("Start Trench Shot",
-                new shootOptimizedShot(shooter, transfer, pivot, drive,
-                        () -> -driver.getLeftY(), () -> -driver.getLeftX())
+                Commands.runEnd(() -> shooter.setOptimizedShotRPS(ShooterConstants.TrenchShootSpeeds.indexerRPS),
+                        shooter::stop, shooter)
+                        .alongWith(new SetTransferSpeed(transfer, TransferConstants.shootTransferSpeed))
                         .withTimeout(6.0));
 
         // Reverse/eject (shooter only, no belt).
