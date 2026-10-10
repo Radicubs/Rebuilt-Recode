@@ -1,0 +1,124 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 3.533143717447916,
+        "y": 7.3649409412202385
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 2.9843559919084814,
+        "y": 7.487443208240327
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 0.6644087727864583,
+        "y": 6.886911911737352
+      },
+      "prevControl": {
+        "x": 0.9141120697913188,
+        "y": 7.484059154981737
+      },
+      "nextControl": {
+        "x": 0.35756684802827393,
+        "y": 6.153121802920389
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 1.1535002208891367,
+        "y": 5.05284447079613
+      },
+      "prevControl": {
+        "x": 0.43312118348965467,
+        "y": 5.052771086286642
+      },
+      "nextControl": {
+        "x": 2.154368722098215,
+        "y": 5.052946428571428
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 2.849,
+        "y": 7.276
+      },
+      "prevControl": {
+        "x": 3.347223714192708,
+        "y": 6.1426711309523805
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": null
+    }
+  ],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 1.0,
+      "rotationDegrees": -90.0
+    },
+    {
+      "waypointRelativePos": 1.6754484660243418,
+      "rotationDegrees": -90.0
+    }
+  ],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [
+    {
+      "name": "Start Trench Shot",
+      "waypointRelativePos": 0,
+      "endWaypointRelativePos": null,
+      "command": null
+    },
+    {
+      "name": "Start Intake",
+      "waypointRelativePos": 0.3476896367521371,
+      "endWaypointRelativePos": 2.3367387820512824,
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "Start Intake"
+        }
+      }
+    },
+    {
+      "name": "Ramp Trench Shot",
+      "waypointRelativePos": 2.0355235042735034,
+      "endWaypointRelativePos": 3.0,
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "Ramp Trench Shot"
+        }
+      }
+    }
+  ],
+  "globalConstraints": {
+    "maxVelocity": 2.8,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0.0,
+    "rotation": -60.86899999999999
+  },
+  "reversed": false,
+  "folder": "Depot Paths",
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": -178.90832693227233
+  },
+  "useDefaultConstraints": true
+}

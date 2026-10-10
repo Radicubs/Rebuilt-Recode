@@ -1,0 +1,147 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 4.423,
+        "y": 0.605
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 3.8538121384450985,
+        "y": 0.9235556205767943
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 2.849,
+        "y": 0.793
+      },
+      "prevControl": {
+        "x": 3.9064237494898215,
+        "y": 0.29193654827618154
+      },
+      "nextControl": {
+        "x": 2.623080298140631,
+        "y": 0.9000527361246498
+      },
+      "isLocked": true,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 2.798164667761071,
+        "y": 1.1183328104947707
+      },
+      "prevControl": {
+        "x": 2.637548551575151,
+        "y": 0.9267539410405665
+      },
+      "nextControl": {
+        "x": 3.0226590290611637,
+        "y": 1.3861040463957262
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 3.1081837100074403,
+        "y": 1.372219761439733
+      },
+      "prevControl": {
+        "x": 2.8714892449365017,
+        "y": 1.452691683280722
+      },
+      "nextControl": {
+        "x": 4.201534759291331,
+        "y": 1.0004997883665674
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 4.423,
+        "y": 0.605
+      },
+      "prevControl": {
+        "x": 3.408517886577457,
+        "y": 1.1007756769697958
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": null
+    }
+  ],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 0.65,
+      "rotationDegrees": 180.0
+    },
+    {
+      "waypointRelativePos": 2.0,
+      "rotationDegrees": -115.91506879537523
+    }
+  ],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [
+    {
+      "name": "Ramp Trench Shot",
+      "waypointRelativePos": 0.0,
+      "endWaypointRelativePos": 2.0,
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "Ramp Trench Shot"
+        }
+      }
+    },
+    {
+      "name": "TrenchShot",
+      "waypointRelativePos": 2.0,
+      "endWaypointRelativePos": null,
+      "command": {
+        "type": "sequential",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "Start Trench Shot"
+              }
+            },
+            {
+              "type": "named",
+              "data": {
+                "name": "Extend Pivot"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "globalConstraints": {
+    "maxVelocity": 2.8,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 2.0,
+    "rotation": 0.0
+  },
+  "reversed": false,
+  "folder": "Start Shoot",
+  "idealStartingState": {
+    "velocity": 2.0,
+    "rotation": 180.0
+  },
+  "useDefaultConstraints": true
+}

@@ -1,0 +1,54 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 2.8,
+        "y": 3.964
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 2.771704880903909,
+        "y": 7.533248867569219
+      },
+      "isLocked": false,
+      "linkedName": "Center Shot"
+    },
+    {
+      "anchor": {
+        "x": 4.423,
+        "y": 7.464
+      },
+      "prevControl": {
+        "x": 2.701884161237785,
+        "y": 7.452695376119707
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "Left Trench Start"
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 2.8,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 2.0,
+    "rotation": 180.0
+  },
+  "reversed": false,
+  "folder": "Connecting Paths",
+  "idealStartingState": {
+    "velocity": 0.0,
+    "rotation": 180.0
+  },
+  "useDefaultConstraints": true
+}

@@ -5,12 +5,20 @@
 
 package frc.robot;
 
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
+
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.commands.intake.SetIntakeSpeed;
 import frc.robot.commands.pivot.MovePivotUntilStall;
+import frc.robot.commands.pivot.SetPivotPosition;
+import frc.robot.commands.pivot.ShakePivot;
 import frc.robot.commands.pivot.FoldPivotWhileShooting;
 import frc.robot.commands.transfer.SetTransferSpeed;
 import frc.robot.commands.drive.TeleopDrive;
@@ -38,9 +46,54 @@ public class RobotContainer {
     // Ports match the USB slots in Driver Station.
     private final CommandXboxController driver = new CommandXboxController(0);
     private final CommandXboxController operator = new CommandXboxController(1);
+    private final SendableChooser<Command> auto_chooser = new SendableChooser<Command>();
     public RobotContainer() {
         configureBindings();
         configureControllers();
+        configureAutoChooser();
+        registerNamedCommands();
+    }
+
+    private void registerNamedCommands() {
+        // ---- Shooter / transfer ----
+        // Ramp the flywheels (indexer held back at -3, no belt).
+        NamedCommands.registerCommand("Ramp Close Shot",
+                new shootOptimizedShot(shooter, transfer, pivot, drive,
+                        () -> -driver.getLeftY(), () -> -driver.getLeftX()));
+        NamedCommands.registerCommand("Ramp Trench Shot",
+                new shootOptimizedShot(shooter, transfer, pivot, drive,
+                        () -> -driver.getLeftY(), () -> -driver.getLeftX()));
+        // Full shot: flywheels + indexer + belt.
+        NamedCommands.registerCommand("Start Close Shot",
+                new shootOptimizedShot(shooter, transfer, pivot, drive,
+                        () -> -driver.getLeftY(), () -> -driver.getLeftX()));
+
+
+        NamedCommands.registerCommand("Start Trench Shot",
+                new shootOptimizedShot(shooter, transfer, pivot, drive,
+                        () -> -driver.getLeftY(), () -> -driver.getLeftX())
+                        .withTimeout(6.0));
+
+        // Reverse/eject (shooter only, no belt).
+        NamedCommands.registerCommand("Eject",
+                new shootOptimizedShot(shooter, transfer, pivot, drive,
+                        () -> -driver.getLeftY(), () -> -driver.getLeftX())
+                        .withTimeout(1));
+
+        // ---- Intake / pivot ----
+        NamedCommands.registerCommand("Start Intake",
+                new SetIntakeSpeed(intake, IntakeConstants.intakeSpeedRPS)
+                        .alongWith(new InstantCommand(() -> pivot.setSpeed(0.07))));
+
+        NamedCommands.registerCommand("Stop Intake", new SetIntakeSpeed(intake, 0));
+
+        NamedCommands.registerCommand("Extend Pivot", new SetPivotPosition(pivot, PivotConstants.downPos));
+
+        NamedCommands.registerCommand("Retract Pivot", new SetPivotPosition(pivot, PivotConstants.upPos));
+
+        NamedCommands.registerCommand("Shake Pivot", new ShakePivot(pivot));
+
+        NamedCommands.registerCommand("Reset Heading", new InstantCommand(() -> drive.setHeading(drive.getHeading().plus(Rotation2d.k180deg))));
     }
 
     private void configureControllers() {
@@ -51,6 +104,23 @@ public class RobotContainer {
                 () -> false
         ));
     }
+
+    private void configureAutoChooser() {
+        try {
+            auto_chooser.setDefaultOption("Left Shoot", AutoBuilder.buildAuto("Left Shoot Auto"));
+            auto_chooser.addOption("Middle Shoot", AutoBuilder.buildAuto("Middle Shoot Auto"));
+            auto_chooser.addOption("Left Center Style Outer", AutoBuilder.buildAuto("Left Center Cycle Auto"));
+            auto_chooser.addOption("Right Center Cycle", AutoBuilder.buildAuto("Right Center Cycle Auto"));
+            auto_chooser.addOption("Left Center Cycle Long", AutoBuilder.buildAuto("Left Center Cycle Long Auto"));
+            auto_chooser.addOption("Right Center Cycle Long", AutoBuilder.buildAuto("Right Center Cycle Long Auto"));
+            auto_chooser.addOption("Middle Depot", AutoBuilder.buildAuto("Middle Depot Auto"));
+        } catch (Exception e) {
+            System.out.println("Error" + e.getMessage());
+            auto_chooser.setDefaultOption("Auto Error", new InstantCommand());
+        }
+        SmartDashboard.putData("Auto Chooser", auto_chooser);
+    }
+
 
     private void configureBindings() {
         operator.b().onTrue(Commands.runOnce(() -> pivot.setDefenseMode(true)));
@@ -105,6 +175,6 @@ public class RobotContainer {
 
     public Command getAutonomousCommand()
     {
-        return Commands.print("No autonomous command configured");
+        return auto_chooser.getSelected();
     }
 }
