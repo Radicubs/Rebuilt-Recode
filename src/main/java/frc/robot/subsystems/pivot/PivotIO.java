@@ -9,6 +9,7 @@ public interface PivotIO {
         public double positionRotations = 0.0;
         public double currentAmps = 0.0;
         public double appliedDuty = 0.0;
+        public double requestedDuty = 0.0;
         public double appliedVolts = 0.0;
     }
 

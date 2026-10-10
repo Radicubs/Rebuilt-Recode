@@ -6,11 +6,12 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.NT4Publisher;
-import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
 
 
@@ -27,7 +28,6 @@ public class Robot extends LoggedRobot
 
         if (isReal())
         {
-            Logger.addDataReceiver(new WPILOGWriter());
             Logger.addDataReceiver(new NT4Publisher());
         }
         else
@@ -45,6 +45,22 @@ public class Robot extends LoggedRobot
     public void robotPeriodic()
     {
         CommandScheduler.getInstance().run();
+        logCANStatus();
+    }
+
+    private void logCANStatus() {
+        var status = RobotController.getCANStatus();
+        double utilizationPercent = status.percentBusUtilization * 100.0;
+        SmartDashboard.putNumber("CAN/UtilizationPercent", utilizationPercent);
+        SmartDashboard.putNumber("CAN/BusOffCount", status.busOffCount);
+        SmartDashboard.putNumber("CAN/TxFullCount", status.txFullCount);
+        SmartDashboard.putNumber("CAN/ReceiveErrorCount", status.receiveErrorCount);
+        SmartDashboard.putNumber("CAN/TransmitErrorCount", status.transmitErrorCount);
+        Logger.recordOutput("CAN/UtilizationPercent", utilizationPercent);
+        Logger.recordOutput("CAN/BusOffCount", status.busOffCount);
+        Logger.recordOutput("CAN/TxFullCount", status.txFullCount);
+        Logger.recordOutput("CAN/ReceiveErrorCount", status.receiveErrorCount);
+        Logger.recordOutput("CAN/TransmitErrorCount", status.transmitErrorCount);
     }
     
     
@@ -67,7 +83,7 @@ public class Robot extends LoggedRobot
         
         if (autonomousCommand != null)
         {
-            autonomousCommand.schedule();
+            CommandScheduler.getInstance().schedule(autonomousCommand);
         }
     }
     

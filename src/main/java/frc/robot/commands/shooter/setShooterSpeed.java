@@ -11,6 +11,7 @@ public class setShooterSpeed extends Command {
     private final DoubleSupplier mainRPS;
     private final DoubleSupplier topRPS;
     private final DoubleSupplier indexerRPS;
+    private boolean waitForSpeed = false;
 
     public setShooterSpeed(Shooter shooter, DoubleSupplier mainRPS, DoubleSupplier topRPS, DoubleSupplier indexerRPS) {
         this.shooter = shooter;
@@ -24,8 +25,18 @@ public class setShooterSpeed extends Command {
         this(shooter, () -> mainRPS, () -> topRPS, () -> indexerRPS);
     }
 
+    public setShooterSpeed(Shooter shooter, double mainRPS, double topRPS, double indexerRPS,
+            boolean waitForSpeed) {
+        this(shooter, mainRPS, topRPS, indexerRPS);
+        this.waitForSpeed = waitForSpeed;
+    }
+
     @Override
     public void execute() {
+        if (waitForSpeed) {
+            shooter.setShooterRPSWhenReady(mainRPS.getAsDouble(), topRPS.getAsDouble(), indexerRPS.getAsDouble());
+            return;
+        }
         shooter.setShooterRPS(
             mainRPS.getAsDouble(), 
             topRPS.getAsDouble(), 

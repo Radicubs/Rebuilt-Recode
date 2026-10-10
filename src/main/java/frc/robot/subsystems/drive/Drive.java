@@ -7,13 +7,17 @@ import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -21,6 +25,8 @@ import frc.robot.constants.FieldConstants;
 import frc.robot.subsystems.drive.module.Module;
 import frc.robot.subsystems.gyro.Gyro;
 import frc.robot.subsystems.vision.VisionFunctions;
+import edu.wpi.first.math.Matrix;
+
 
 import java.util.Optional;
 
@@ -32,6 +38,7 @@ public class Drive extends SubsystemBase {
     private final Gyro gyro;
 
     private final SwerveDrivePoseEstimator poseEstimator;
+    private boolean fieldPoseInitialized = false;
     private final DriveLogger logger;
 
     private RobotConfig config;
@@ -156,6 +163,11 @@ public class Drive extends SubsystemBase {
 
     public void setPose(Pose2d pose) {
         poseEstimator.resetPosition(getGyroYaw(), getModulePositions(), pose);
+        fieldPoseInitialized = true;
+    }
+
+    public boolean hasFieldPose() {
+        return fieldPoseInitialized;
     }
 
     public Rotation2d getHeading() {
@@ -180,8 +192,22 @@ public class Drive extends SubsystemBase {
         }
     }
 
-    public void addVisionMeasurement(Pose2d estimatedPose, double timestampSeconds) {
-        poseEstimator.addVisionMeasurement(estimatedPose, timestampSeconds);
+    public void lockX() {
+    setModuleStates(new SwerveModuleState[] {
+        new SwerveModuleState(0, Rotation2d.fromDegrees(45)),  // Front left
+        new SwerveModuleState(0, Rotation2d.fromDegrees(-45)), // Front right
+        new SwerveModuleState(0, Rotation2d.fromDegrees(-45)), // Back left
+        new SwerveModuleState(0, Rotation2d.fromDegrees(45))   // Back right
+    });
+}
+
+    public void addVisionMeasurement(
+        Pose2d visionPose,
+        double timestampSeconds) {
+
+    poseEstimator.addVisionMeasurement(
+            visionPose,
+            timestampSeconds);
     }
 
     public Optional<Rotation2d> getHeadingToHub() {

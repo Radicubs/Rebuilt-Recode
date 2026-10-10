@@ -6,6 +6,8 @@ public final class ShooterConstants
     public static final int leftShooterCID = 16;
 
     public static final double pidTolerance = 0.5;
+    public static final double optimizedTopShooterRPS = 25.0;
+    public static final double readyToFeedSeconds = 0.1;
 
     public static final int indexerCID = 14;
     public static final int topShooterCID = 13;

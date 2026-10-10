@@ -72,11 +72,12 @@ public final class DriveConstants {
     public static final double driveKA = 0.0;
 
     /* Swerve Profiling Values */
-    /** Meters per Second */
-    public static final double maxSpeed = 3.0; // Match the default PathPlanner velocity limit.
+    /** Theoretical Kraken X60 free speed at 12 V, meters per second (~4.73 with MK4i L2). */
+    public static final double maxSpeed = (6000.0 / 60.0) * wheelCircumference / driveGearRatio;
     public static final double joystickDeadband = 0.08;
-    /** Radians per Second */
-    public static final double maxAngularVelocity = 2; //TODO: This must be tuned to specific robot
+    /** Midpoint between the original 2 rad/s and theoretical pure-rotation maximum (~6.06 rad/s). */
+    public static final double maxAngularVelocity =
+            (2.0 + maxSpeed / Math.hypot(wheelBase / 2.0, trackWidth / 2.0)) / 2.0;
 
     /* Neutral Modes */
     public static final NeutralModeValue angleNeutralMode = NeutralModeValue.Brake;
@@ -116,7 +117,7 @@ public final class DriveConstants {
         public static final int driveMotorID = 4;
         public static final int angleMotorID = 3;
         public static final int canCoderID = 10;
-        public static final Rotation2d angleOffset = Rotation2d.fromDegrees(-173.320);
+        public static final Rotation2d angleOffset = Rotation2d.fromDegrees(-175.166015625);
         public static final SwerveModuleConstants constants =
                 new SwerveModuleConstants(driveMotorID, angleMotorID, canCoderID, angleOffset);
     }
@@ -126,7 +127,7 @@ public final class DriveConstants {
         public static final int driveMotorID = 2;
         public static final int angleMotorID = 1;
         public static final int canCoderID = 9;
-        public static final Rotation2d angleOffset = Rotation2d.fromDegrees(-27.246);
+        public static final Rotation2d angleOffset = Rotation2d.fromDegrees(-173.408203125);
         public static final SwerveModuleConstants constants =
                 new SwerveModuleConstants(driveMotorID, angleMotorID, canCoderID, angleOffset);
     }

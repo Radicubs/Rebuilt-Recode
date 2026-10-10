@@ -1,6 +1,7 @@
 package frc.robot.util;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 
 public class Conversions {
 
@@ -21,7 +22,15 @@ public class Conversions {
     }
 
     public static double[] poseToArray(Pose2d pose) {
-        return new double[] {pose.getX(), pose.getY(), pose.getRotation().getDegrees()};
+        if (pose != null)
+            return new double[] {pose.getX(), pose.getY(), pose.getRotation().getDegrees()};
+        return null;
+    }
+
+    public static double[] poseToArray(Pose3d pose) {
+        if (pose != null)
+            return new double[] {pose.getX(), pose.getY(), pose.getZ(), pose.getRotation().toRotation2d().getDegrees()};
+        return null;
     }
     
 }

@@ -1,13 +1,17 @@
 package frc.robot.subsystems.vision;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.util.Conversions;
+
 import org.littletonrobotics.junction.Logger;
+
 
 final class VisionLogger {
 
     private VisionLogger() {}
 
     static void publish(Vision vision) {
+        SmartDashboard.setDefaultBoolean("Vision/ShowCameraPoses", false);
         SmartDashboard.putData("Photon Vision", b -> {
             b.addBooleanProperty("Has Tag", () -> vision.getBestTagId() != -1, null);
             b.addIntegerProperty("Best Tag", vision::getBestTagId, null);
@@ -20,5 +24,12 @@ final class VisionLogger {
         Logger.recordOutput("Vision/Cam0Connected", vision.cam0Connected());
         Logger.recordOutput("Vision/Cam1Connected", vision.cam1Connected());
         Logger.recordOutput("Vision/Hub Distance", VisionFunctions.getHubDistanceMeters());
+        // var orangePose = vision.getOrangePose();
+        // var juicePose = vision.getJuicePose();
+        // Logger.recordOutput("Vision/OrangePose",
+        //         orangePose != null ? Conversions.poseToArray(orangePose) : new double[0]);
+        // Logger.recordOutput("Vision/JuicePose",
+        //         juicePose != null ? Conversions.poseToArray(juicePose) : new double[0]);
     }
+
 }

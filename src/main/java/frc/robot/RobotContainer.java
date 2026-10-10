@@ -7,16 +7,15 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.commands.intake.SetIntakeSpeed;
+import frc.robot.commands.pivot.MovePivotUntilStall;
 import frc.robot.commands.pivot.FoldPivotWhileShooting;
-import frc.robot.commands.pivot.SetPivotPosition;
-import frc.robot.commands.pivot.ShakePivot;
 import frc.robot.commands.transfer.SetTransferSpeed;
 import frc.robot.commands.drive.TeleopDrive;
 import frc.robot.commands.shooter.setShooterSpeed;
 import frc.robot.commands.shooter.shootOptimizedShot;
-import frc.robot.commands.vision.AutoAlignTag;
 import frc.robot.constants.IntakeConstants;
 import frc.robot.constants.PivotConstants;
 import frc.robot.constants.ShooterConstants;
@@ -26,11 +25,9 @@ import frc.robot.subsystems.pivot.Pivot;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.transfer.Transfer;
 import frc.robot.subsystems.drive.Drive;
-import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
 
 
-
-public class RobotContainer{
+public class RobotContainer {
     // Shooter dashboard getters need the field pose; Drive initializes VisionFunctions.
     Drive drive = Drive.getInstance();
     Intake intake = Intake.getInstance();
@@ -38,60 +35,74 @@ public class RobotContainer{
     Transfer transfer = Transfer.getInstance();
     Pivot pivot = Pivot.getInstance();
 
+    // Ports match the USB slots in Driver Station.
+    private final CommandXboxController driver = new CommandXboxController(0);
+    private final CommandXboxController operator = new CommandXboxController(1);
+    public RobotContainer() {
+        configureBindings();
+        configureControllers();
+    }
 
-    private CommandXboxController operator = new CommandXboxController(0);
-        // private CommandXboxController driver = new CommandXboxController(0);
-        private CommandPS5Controller driver = new CommandPS5Controller(1);
-        public RobotContainer()
-        {
-            configureBindings();
-            configureControllers();
-        }
-    
-        
-        private void configureControllers() {
-            // driver =  new CommandPS5Controller(0);
-            // operator = new CommandXboxController(1);
-
+    private void configureControllers() {
         drive.setDefaultCommand(new TeleopDrive(
                 () -> -driver.getLeftY(),
                 () -> -driver.getLeftX(),
                 () -> -driver.getRightX(),
-                () -> false //mainController.x().getAsBoolean()
+                () -> false
         ));
     }
+
     private void configureBindings() {
-        operator.x().whileTrue(new SetIntakeSpeed(intake, IntakeConstants.intakeSpeedRPS).alongWith(new SetTransferSpeed(transfer, TransferConstants.intakeTransferSpeed)));
-    
-        operator.rightBumper().whileTrue(new setShooterSpeed(shooter,ShooterConstants.CloseShootSpeeds.mainShooterRPS , ShooterConstants.CloseShootSpeeds.topShaftRPS, ShooterConstants.CloseShootSpeeds.indexerRPS).alongWith(new SetTransferSpeed(transfer, TransferConstants.shootTransferSpeed)).alongWith(new FoldPivotWhileShooting(pivot, PivotConstants.middlePos)));
+        operator.b().onTrue(Commands.runOnce(() -> pivot.setDefenseMode(true)));
+        operator.a().onTrue(Commands.runOnce(() -> pivot.setDefenseMode(false)));
 
-        operator.rightTrigger().whileTrue(new setShooterSpeed(shooter, ShooterConstants.TrenchShootSpeeds.mainShooterRPS, ShooterConstants.TrenchShootSpeeds.topShaftRPS, ShooterConstants.TrenchShootSpeeds.indexerRPS).alongWith(new SetTransferSpeed(transfer, TransferConstants.shootTransferSpeed)).alongWith(new FoldPivotWhileShooting(pivot, 0 )));
+        operator.y().whileTrue(
+                new setShooterSpeed(shooter, ShooterConstants.TrenchShootSpeeds.mainShooterRPS,
+                        ShooterConstants.TrenchShootSpeeds.topShaftRPS,
+                        ShooterConstants.TrenchShootSpeeds.indexerRPS, true)
+                        .alongWith(new SetTransferSpeed(transfer, TransferConstants.shootTransferSpeed,
+                                () -> shooter.getIndexerSetSpeed() > 0.0))
+                        .alongWith(new FoldPivotWhileShooting(pivot, PivotConstants.foldSpeed)));
 
-        operator.leftTrigger().whileTrue(new setShooterSpeed(shooter, ShooterConstants.PassSpeeds.mainShooterRPS, ShooterConstants.PassSpeeds.topShaftRPS, ShooterConstants.PassSpeeds.indexerRPS).alongWith(new SetTransferSpeed(transfer, TransferConstants.shootTransferSpeed)).alongWith(new FoldPivotWhileShooting(pivot, .05)));
+        operator.x().whileTrue(
+                new setShooterSpeed(shooter, ShooterConstants.CloseShootSpeeds.mainShooterRPS,
+                        ShooterConstants.CloseShootSpeeds.topShaftRPS,
+                        ShooterConstants.CloseShootSpeeds.indexerRPS, true)
+                        .alongWith(new SetTransferSpeed(transfer, TransferConstants.shootTransferSpeed,
+                                () -> shooter.getIndexerSetSpeed() > 0.0))
+                        .alongWith(new FoldPivotWhileShooting(pivot, PivotConstants.foldSpeed)));
 
-        operator.leftBumper().whileTrue(new setShooterSpeed(shooter, ShooterConstants.EjectSpeeds.mainShooterRPS, ShooterConstants.EjectSpeeds.topShaftRPS, ShooterConstants.EjectSpeeds.indexerRPS).alongWith(new SetTransferSpeed(transfer, TransferConstants.shootTransferSpeed)));
+        driver.rightTrigger().whileTrue(
+                new shootOptimizedShot(shooter, transfer, pivot, drive,
+                        () -> -driver.getLeftY(), () -> -driver.getLeftX()));
 
-        operator.povUp().onTrue(new SetPivotPosition(pivot, PivotConstants.upPos));
+        driver.rightBumper().whileTrue(
+                new setShooterSpeed(shooter, ShooterConstants.PassSpeeds.mainShooterRPS,
+                        ShooterConstants.PassSpeeds.topShaftRPS,
+                        ShooterConstants.PassSpeeds.indexerRPS, true)
+                        .alongWith(new SetTransferSpeed(transfer, TransferConstants.shootTransferSpeed,
+                                () -> shooter.getIndexerSetSpeed() > 0.0))
+                        .alongWith(new FoldPivotWhileShooting(pivot, PivotConstants.foldSpeed)));
 
+        driver.leftBumper().whileTrue(
+                new SetIntakeSpeed(intake, IntakeConstants.outtakeSpeedRPS)
+                        .alongWith(new SetTransferSpeed(transfer, -TransferConstants.intakeTransferSpeed)));
 
-        operator.rightTrigger().whileTrue(new shootOptimizedShot(shooter, 20)
-            .alongWith(new SetTransferSpeed(transfer, TransferConstants.shootTransferSpeed))
-        );
+        driver.leftTrigger().whileTrue(
+                new SetIntakeSpeed(intake, IntakeConstants.intakeSpeedRPS)
+                        .alongWith(new SetTransferSpeed(transfer, TransferConstants.intakeTransferSpeed))
+                        .alongWith(new MovePivotUntilStall(pivot, PivotConstants.downSpeed)));
 
+        driver.x().whileTrue(Commands.runEnd(drive::lockX, drive::stop, drive));
 
-        // driver.rightTrigger().whileTrue(new AutoAlignTag(
-        //     drive,
-        //     () -> -driver.getLeftY(),
-        //     () -> -driver.getLeftX()
-        // ));
-        driver.R2().whileTrue(new AutoAlignTag(
-            drive,
-            () -> -driver.getLeftY(),
-            () -> -driver.getLeftX()
-        ));
+        operator.povUp()
+                .onTrue(new MovePivotUntilStall(pivot, PivotConstants.upSpeed));
+        operator.povDown()
+                .onTrue(new MovePivotUntilStall(pivot, PivotConstants.downSpeed));
     }
+
     
-    
+
     public Command getAutonomousCommand()
     {
         return Commands.print("No autonomous command configured");

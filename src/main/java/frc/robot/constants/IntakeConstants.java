@@ -4,6 +4,7 @@ public final class IntakeConstants {
     public static final int intakeMotorCID = 20;
 
     public static final double intakeSpeedRPS = 55;
+    public static final double outtakeSpeedRPS = -55;
 
     public static final class PIDFeedforwardConstants {
         public static final double P = 0;

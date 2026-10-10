@@ -98,6 +98,10 @@ public class AutoAlignTag extends Command {
     return finishWhenAligned && aligned;
   }
 
+  public boolean isAligned() {
+    return aligned;
+  }
+
   private Pose2d getTargetPose() {
     return VisionFunctions.getHubTargetPose();
   }

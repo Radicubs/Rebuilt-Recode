@@ -1,6 +1,7 @@
 package frc.robot.subsystems.intake;
 
 import frc.robot.constants.IntakeConstants;
+import frc.robot.util.CANSignalConfig;
 
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkLowLevel;
@@ -21,6 +22,7 @@ class IntakeIOReal implements IntakeIO {
         SparkMaxConfig intakeConfig = new SparkMaxConfig();
         intakeConfig.inverted(false);
         intakeConfig.idleMode(SparkBaseConfig.IdleMode.kBrake);
+        CANSignalConfig.configureSpark(intakeConfig.signals, false);
         intakeMotor.configure(intakeConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
         encoder = intakeMotor.getEncoder();

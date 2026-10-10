@@ -2,6 +2,7 @@ package frc.robot.subsystems.drive.module;
 
 import frc.robot.constants.SwerveModuleConstants;
 import frc.robot.constants.DriveConstants;
+import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.PositionVoltage;
@@ -23,10 +24,10 @@ class ModuleIOReal implements ModuleIO {
     private final SimpleMotorFeedforward driveFeedForward =
             new SimpleMotorFeedforward(DriveConstants.driveKS, DriveConstants.driveKV, DriveConstants.driveKA);
 
-    private final DutyCycleOut driveDutyCycle = new DutyCycleOut(0);
-    private final VelocityVoltage driveVelocity = new VelocityVoltage(0);
-    private final PositionVoltage anglePositionP = new PositionVoltage(0);
-    private final MotionMagicVoltage anglePositionM = new MotionMagicVoltage(0);
+    private final DutyCycleOut driveDutyCycle = new DutyCycleOut(0).withUpdateFreqHz(50.0);
+    private final VelocityVoltage driveVelocity = new VelocityVoltage(0).withUpdateFreqHz(50.0);
+    private final PositionVoltage anglePositionP = new PositionVoltage(0).withUpdateFreqHz(50.0);
+    private final MotionMagicVoltage anglePositionM = new MotionMagicVoltage(0).withUpdateFreqHz(50.0);
 
     ModuleIOReal(SwerveModuleConstants moduleConstants) {
         angleOffset = moduleConstants.angleOffset;
@@ -43,6 +44,20 @@ class ModuleIOReal implements ModuleIO {
         driveMotor.getConfigurator().apply(moduleConstants.ctreConfigs.swerveDriveFXConfig);
         driveMotor.setNeutralMode(NeutralModeValue.Brake);
         driveMotor.getConfigurator().setPosition(0.0);
+
+        // Match the 20 ms robot loop for odometry and module-state feedback.
+        BaseStatusSignal.setUpdateFrequencyForAll(50.0,
+                driveMotor.getPosition(), driveMotor.getVelocity(),
+                angleMotor.getPosition(), angleMotor.getVelocity());
+        // TeleopDrive resets steering from this signal when it resumes; keep it fresh.
+        angleEncoder.getAbsolutePosition().setUpdateFrequency(50.0);
+        BaseStatusSignal.setUpdateFrequencyForAll(2.0,
+                driveMotor.getMotorVoltage(), driveMotor.getSupplyCurrent(),
+                angleMotor.getMotorVoltage(), angleMotor.getSupplyCurrent());
+        // Reduce unused traffic while retaining low-rate diagnostic visibility.
+        driveMotor.optimizeBusUtilization(4.0);
+        angleMotor.optimizeBusUtilization(4.0);
+        angleEncoder.optimizeBusUtilization(4.0);
     }
 
     @Override

@@ -1,49 +1,36 @@
 package frc.robot.commands.pivot;
-
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.pivot.Pivot;
 import frc.robot.constants.PivotConstants;
+import frc.robot.subsystems.pivot.Pivot;
 
+/** Folds to halfway while shooting, then brakes until the shot ends. */
 public class FoldPivotWhileShooting extends Command {
+  private final Pivot pivot;
+  private final double speed;
+  private boolean reachedFoldPosition;
 
-   private static final double FOLD_SPEED_RATE = 0.05; 
+  public FoldPivotWhileShooting(Pivot pivot, double speed) {
+    this.pivot = pivot;
+    this.speed = speed;
+    addRequirements(pivot);
+  }
 
-    private final Pivot pivot;
-    private final double degrees;
-    private final Timer timer = new Timer();
+  @Override
+  public void initialize() {
+    reachedFoldPosition = false;
+    execute();
+  }
 
-    public FoldPivotWhileShooting(Pivot pivot, double degrees) {
-        this.pivot = pivot;
-        this.degrees = degrees;
-        addRequirements(pivot);
-    }
+  @Override
+  public void execute() {
+    // Folding inward decreases encoder position. Latch the stop to avoid
+    // restarting against the limit due to small sensor changes or arm motion.
+    reachedFoldPosition |= pivot.getPosition() <= PivotConstants.shotFoldPosition;
+    pivot.setSpeed(reachedFoldPosition ? 0.0 : speed);
+  }
 
-    @Override
-    public void initialize() {
-        timer.restart();
-    }
-
-    @Override
-    public void execute() {
-        double elapsedTime = timer.get();
-        
-        double targetPosition = degrees - (elapsedTime * FOLD_SPEED_RATE);
-        
-        double minLimit = Math.min(PivotConstants.upPos, PivotConstants.downPos);
-        double maxLimit = Math.max(PivotConstants.upPos, PivotConstants.downPos);
-        targetPosition = Math.max(minLimit, Math.min(maxLimit, targetPosition));
-
-        pivot.setGoal(targetPosition);
-    }
-
-    @Override
-    public boolean isFinished() {
-        return false;
-    }
-
-    @Override
-    public void end(boolean interrupted) {
-        pivot.setGoal(PivotConstants.downPos);
-    }
+  @Override
+  public void end(boolean interrupted) {
+    pivot.setSpeed(0.0);
+  }
 }

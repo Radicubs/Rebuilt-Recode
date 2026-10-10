@@ -1,5 +1,6 @@
 package frc.robot.subsystems.shooter;
 
+import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -18,7 +19,10 @@ public class ShooterIOReal implements ShooterIO {
 
     
 
-    private final VelocityVoltage leftVel = new VelocityVoltage(0), rightVel = new VelocityVoltage(0), topVel = new VelocityVoltage(0), indexerVel = new VelocityVoltage(0);
+    private final VelocityVoltage leftVel = new VelocityVoltage(0).withUpdateFreqHz(50.0);
+    private final VelocityVoltage rightVel = new VelocityVoltage(0).withUpdateFreqHz(50.0);
+    private final VelocityVoltage topVel = new VelocityVoltage(0).withUpdateFreqHz(50.0);
+    private final VelocityVoltage indexerVel = new VelocityVoltage(0).withUpdateFreqHz(50.0);
 
     private final SimpleMotorFeedforward leftFF = new SimpleMotorFeedforward(ShooterConstants.MainLeftShooterPIDFeedforwardConstants.kS,ShooterConstants.MainLeftShooterPIDFeedforwardConstants.kV,ShooterConstants.MainLeftShooterPIDFeedforwardConstants.kA);
 
@@ -75,6 +79,14 @@ public class ShooterIOReal implements ShooterIO {
         leftShooter = new TalonFX(ShooterConstants.leftShooterCID);
         leftShooter.getConfigurator().apply(leftConfig);
 
+        for (TalonFX motor : new TalonFX[] {leftShooter, rightShooter, topShooter, indexer}) {
+            // Velocity control runs onboard; this feedback is used for logging.
+            motor.getVelocity().setUpdateFrequency(25.0);
+            BaseStatusSignal.setUpdateFrequencyForAll(2.0,
+                    motor.getMotorVoltage(), motor.getStatorCurrent());
+            motor.optimizeBusUtilization(0.0);
+        }
+
     }
 
         @Override
@@ -130,6 +142,4 @@ public class ShooterIOReal implements ShooterIO {
     }
 
     
-
-
 

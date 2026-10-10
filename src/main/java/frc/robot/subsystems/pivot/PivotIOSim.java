@@ -31,6 +31,7 @@ class PivotIOSim implements PivotIO {
         sim.update(0.02);
         inputs.positionRotations = sim.getAngularPositionRotations();
         inputs.appliedDuty = lastDuty;
+        inputs.requestedDuty = lastDuty;
         inputs.appliedVolts = lastDuty * NOMINAL_BUS_VOLTAGE;
         inputs.currentAmps = sim.getCurrentDrawAmps();
     }

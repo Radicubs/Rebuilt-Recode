@@ -8,6 +8,7 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 import frc.robot.constants.TransferConstants;
+import frc.robot.util.CANSignalConfig;
 
 public class TransferIOReal implements TransferIO {
     private SparkMax transferMotor;
@@ -18,6 +19,7 @@ public class TransferIOReal implements TransferIO {
         config.inverted(false);
         config.idleMode(IdleMode.kCoast);
         config.smartCurrentLimit(TransferConstants.transferMotorStallCurrentLimit, TransferConstants.transferMotorFreeCurrentLimit);
+        CANSignalConfig.configureSpark(config.signals, false);
         
         transferMotor = new SparkMax(TransferConstants.transferMotorCID, SparkMax.MotorType.kBrushless);
         transferMotor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);

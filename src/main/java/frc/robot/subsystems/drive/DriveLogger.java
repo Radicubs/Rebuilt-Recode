@@ -3,15 +3,15 @@ package frc.robot.subsystems.drive;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.util.Conversions;
+import frc.robot.util.FieldManager;
 
 import org.littletonrobotics.junction.Logger;
 
 final class DriveLogger {
 
-    private final Field2d field = new Field2d();
+    private final Field2d field = FieldManager.getInstance().getField();
 
     DriveLogger(Drive drive) {
-        SmartDashboard.putData(field);
         SmartDashboard.putData("Heading", b -> {
             b.setSmartDashboardType("Gyro");
             b.addDoubleProperty("Value", () -> (drive.getHeading() != null ? drive.getHeading().getDegrees() : 0), null);
