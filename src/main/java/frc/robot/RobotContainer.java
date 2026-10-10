@@ -50,8 +50,8 @@ public class RobotContainer {
     public RobotContainer() {
         configureBindings();
         configureControllers();
-        configureAutoChooser();
         registerNamedCommands();
+        configureAutoChooser();
     }
 
     private void registerNamedCommands() {
