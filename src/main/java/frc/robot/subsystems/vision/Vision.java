@@ -6,6 +6,7 @@ import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.drive.Drive;
 import org.photonvision.EstimatedRobotPose;
@@ -40,6 +41,10 @@ public class Vision extends SubsystemBase {
                     VisionConstants.camera_1_OffsetZ, new Rotation3d(Rotation2d.kCCW_90deg)));
     private PhotonPipelineResult latestResult1;
 
+    // A camera that throws (e.g. PhotonVision version mismatch) is turned off instead of crashing robot code.
+    private boolean cam0Failed = false;
+    private boolean cam1Failed = false;
+
     private Vision() {
         VisionLogger.publish(this);
     }
@@ -54,8 +59,24 @@ public class Vision extends SubsystemBase {
 
     @Override
     public void periodic() {
-        latestResult0 = process(camera0, estimator0, latestResult0);
-        latestResult1 = process(camera1, estimator1, latestResult1);
+        if (!cam0Failed) {
+            try {
+                latestResult0 = process(camera0, estimator0, latestResult0);
+            } catch (RuntimeException e) {
+                cam0Failed = true;
+                latestResult0 = null;
+                DriverStation.reportError("Vision camera \"orange\" disabled: " + e.getMessage(), e.getStackTrace());
+            }
+        }
+        if (!cam1Failed) {
+            try {
+                latestResult1 = process(camera1, estimator1, latestResult1);
+            } catch (RuntimeException e) {
+                cam1Failed = true;
+                latestResult1 = null;
+                DriverStation.reportError("Vision camera \"juice\" disabled: " + e.getMessage(), e.getStackTrace());
+            }
+        }
         VisionLogger.log(this);
     }
 
