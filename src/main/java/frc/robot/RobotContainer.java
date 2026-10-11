@@ -133,6 +133,7 @@ public class RobotContainer {
                         ShooterConstants.TrenchShootSpeeds.topShaftRPS,
                         ShooterConstants.TrenchShootSpeeds.indexerRPS)
                         .alongWith(new SetTransferSpeed(transfer, TransferConstants.shootTransferSpeed))
+                        .alongWith(Commands.runEnd(drive::lockX, drive::stop, drive))
         );
 
         operator.x().whileTrue(
@@ -140,11 +141,28 @@ public class RobotContainer {
                         ShooterConstants.CloseShootSpeeds.topShaftRPS,
                         ShooterConstants.CloseShootSpeeds.indexerRPS)
                         .alongWith(new SetTransferSpeed(transfer, TransferConstants.shootTransferSpeed))
+                        .alongWith(Commands.runEnd(drive::lockX, drive::stop, drive))
         );
 
         driver.rightTrigger().whileTrue(
                 new shootOptimizedShot(shooter, transfer, pivot, drive,
                         () -> -driver.getLeftY(), () -> -driver.getLeftX()));
+
+        driver.a().whileTrue(
+                new setShooterSpeed(shooter, ShooterConstants.CloseShootSpeeds.mainShooterRPS,
+                        ShooterConstants.CloseShootSpeeds.topShaftRPS,
+                        ShooterConstants.CloseShootSpeeds.indexerRPS)
+                        .alongWith(new SetTransferSpeed(transfer, TransferConstants.shootTransferSpeed))
+                        .alongWith(Commands.runEnd(drive::lockX, drive::stop, drive))
+        );
+
+        driver.b().whileTrue(
+                new setShooterSpeed(shooter, ShooterConstants.TrenchShootSpeeds.mainShooterRPS,
+                        ShooterConstants.TrenchShootSpeeds.topShaftRPS,
+                        ShooterConstants.TrenchShootSpeeds.indexerRPS)
+                        .alongWith(new SetTransferSpeed(transfer, TransferConstants.shootTransferSpeed))
+                        .alongWith(Commands.runEnd(drive::lockX, drive::stop, drive))
+        );
 
         driver.rightBumper().whileTrue(
                 new setShooterSpeed(shooter, ShooterConstants.PassSpeeds.mainShooterRPS,
@@ -162,6 +180,8 @@ public class RobotContainer {
                 new SetIntakeSpeed(intake, IntakeConstants.intakeSpeedRPS)
                         .alongWith(new SetTransferSpeed(transfer, TransferConstants.intakeTransferSpeed))
                         .alongWith(new MovePivotUntilStall(pivot, PivotConstants.downSpeed)));
+        driver.povUp().onTrue(
+                new MovePivotUntilStall(pivot, PivotConstants.upSpeed));
 
         driver.x().whileTrue(Commands.runEnd(drive::lockX, drive::stop, drive));
 
