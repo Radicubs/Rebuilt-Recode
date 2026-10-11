@@ -23,6 +23,6 @@ public class SwerveModuleConstants {
         this.angleMotorID = angleMotorID;
         this.cancoderID = canCoderID;
         this.angleOffset = angleOffset;
-        this.ctreConfigs = new CTREConfigs(angleMotorInvert, driveMotorInvert);
+        this.ctreConfigs = new CTREConfigs(driveMotorInvert, angleMotorInvert);
     }
 }

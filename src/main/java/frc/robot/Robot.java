@@ -12,6 +12,10 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.NT4Publisher;
+import org.littletonrobotics.junction.wpilog.WPILOGWriter;
+import frc.robot.constants.DriveConstants;
+
+import java.io.File;
 
 
 
@@ -20,6 +24,8 @@ public class Robot extends LoggedRobot
     private Command autonomousCommand;
     
     private final RobotContainer robotContainer;
+
+    private int canLogCounter = 0;
     
     
     public Robot()
@@ -29,6 +35,11 @@ public class Robot extends LoggedRobot
         if (isReal())
         {
             Logger.addDataReceiver(new NT4Publisher());
+            // Match logs go to a USB stick when one is plugged in (keeps roboRIO storage free).
+            if (new File("/U").isDirectory())
+            {
+                Logger.addDataReceiver(new WPILOGWriter());
+            }
         }
         else
         {
@@ -45,7 +56,38 @@ public class Robot extends LoggedRobot
     public void robotPeriodic()
     {
         CommandScheduler.getInstance().run();
-    }  
+        // CAN health at 5 Hz: enough for pit checks without loading the main loop.
+        if (++canLogCounter >= 10)
+        {
+            canLogCounter = 0;
+            logCANStatus();
+        }
+    }
+
+    private void logCANStatus()
+    {
+        var rio = RobotController.getCANStatus();
+        SmartDashboard.putNumber("CAN/RIO/UtilizationPercent", rio.percentBusUtilization * 100.0);
+        SmartDashboard.putNumber("CAN/RIO/BusOffCount", rio.busOffCount);
+        SmartDashboard.putNumber("CAN/RIO/TxFullCount", rio.txFullCount);
+        Logger.recordOutput("CAN/RIO/UtilizationPercent", rio.percentBusUtilization * 100.0);
+        Logger.recordOutput("CAN/RIO/BusOffCount", rio.busOffCount);
+        Logger.recordOutput("CAN/RIO/TxFullCount", rio.txFullCount);
+
+        if (isReal())
+        {
+            var canivore = DriveConstants.canBus.getStatus();
+            boolean ok = canivore.Status.isOK();
+            SmartDashboard.putBoolean("CAN/CANivore/OK", ok);
+            SmartDashboard.putNumber("CAN/CANivore/UtilizationPercent", canivore.BusUtilization * 100.0);
+            SmartDashboard.putNumber("CAN/CANivore/BusOffCount", canivore.BusOffCount);
+            SmartDashboard.putNumber("CAN/CANivore/TxFullCount", canivore.TxFullCount);
+            Logger.recordOutput("CAN/CANivore/OK", ok);
+            Logger.recordOutput("CAN/CANivore/UtilizationPercent", canivore.BusUtilization * 100.0);
+            Logger.recordOutput("CAN/CANivore/BusOffCount", canivore.BusOffCount);
+            Logger.recordOutput("CAN/CANivore/TxFullCount", canivore.TxFullCount);
+        }
+    }
     
     @Override
     public void disabledInit() {}

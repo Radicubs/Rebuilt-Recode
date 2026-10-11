@@ -3,6 +3,7 @@ package frc.robot.subsystems.drive.module;
 import frc.robot.constants.SwerveModuleConstants;
 import frc.robot.constants.DriveConstants;
 import com.ctre.phoenix6.BaseStatusSignal;
+import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.PositionVoltage;
@@ -12,7 +13,10 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.DriverStation;
 import frc.robot.util.Conversions;
+
+import java.util.function.Supplier;
 
 class ModuleIOReal implements ModuleIO {
 
@@ -32,16 +36,19 @@ class ModuleIOReal implements ModuleIO {
     ModuleIOReal(SwerveModuleConstants moduleConstants) {
         angleOffset = moduleConstants.angleOffset;
 
-        angleEncoder = new CANcoder(moduleConstants.cancoderID);
-        angleEncoder.getConfigurator().apply(moduleConstants.ctreConfigs.swerveCANcoderConfig);
+        angleEncoder = new CANcoder(moduleConstants.cancoderID, DriveConstants.canBus);
+        applyWithRetry("CANcoder " + moduleConstants.cancoderID,
+                () -> angleEncoder.getConfigurator().apply(moduleConstants.ctreConfigs.swerveCANcoderConfig));
 
-        angleMotor = new TalonFX(moduleConstants.angleMotorID);
-        angleMotor.getConfigurator().apply(moduleConstants.ctreConfigs.swerveAngleFXConfig);
+        angleMotor = new TalonFX(moduleConstants.angleMotorID, DriveConstants.canBus);
+        applyWithRetry("Angle TalonFX " + moduleConstants.angleMotorID,
+                () -> angleMotor.getConfigurator().apply(moduleConstants.ctreConfigs.swerveAngleFXConfig));
         angleMotor.setNeutralMode(NeutralModeValue.Brake);
         resetToAbsolute();
 
-        driveMotor = new TalonFX(moduleConstants.driveMotorID);
-        driveMotor.getConfigurator().apply(moduleConstants.ctreConfigs.swerveDriveFXConfig);
+        driveMotor = new TalonFX(moduleConstants.driveMotorID, DriveConstants.canBus);
+        applyWithRetry("Drive TalonFX " + moduleConstants.driveMotorID,
+                () -> driveMotor.getConfigurator().apply(moduleConstants.ctreConfigs.swerveDriveFXConfig));
         driveMotor.setNeutralMode(NeutralModeValue.Brake);
         driveMotor.getConfigurator().setPosition(0.0);
 
@@ -98,8 +105,26 @@ class ModuleIOReal implements ModuleIO {
 
     @Override
     public void resetToAbsolute() {
-        double absolutePosition = angleEncoder.getAbsolutePosition().getValueAsDouble() - angleOffset.getRotations();
+        // Wait for a fresh frame so a reset right after boot doesn't seed from a stale/zero reading.
+        var absolute = angleEncoder.getAbsolutePosition().waitForUpdate(0.25);
+        if (!absolute.getStatus().isOK()) {
+            DriverStation.reportError("Swerve CANcoder " + angleEncoder.getDeviceID()
+                    + " absolute position unavailable: " + absolute.getStatus(), false);
+            return;
+        }
+        double absolutePosition = absolute.getValueAsDouble() - angleOffset.getRotations();
         angleMotor.setPosition(absolutePosition);
+    }
+
+    /** Config applies can time out while the CAN bus is still booting; retry and report failures. */
+    private static void applyWithRetry(String device, Supplier<StatusCode> apply) {
+        StatusCode status = StatusCode.StatusCodeNotInitialized;
+        for (int attempt = 0; attempt < 5 && !status.isOK(); attempt++) {
+            status = apply.get();
+        }
+        if (!status.isOK()) {
+            DriverStation.reportError("Failed to configure swerve " + device + ": " + status, false);
+        }
     }
 
     @Override

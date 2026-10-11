@@ -1,5 +1,6 @@
 package frc.robot.constants;
 
+import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
@@ -9,6 +10,9 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.util.Units;
 
 public final class DriveConstants {
+    /* CAN bus: entire drivetrain lives on the CANivore (name set in Phoenix Tuner X) */
+    public static final CANBus canBus = new CANBus("canivore");
+
     public static final COTSTalonFXSwerveConstants chosenModule =  // MK4i with Kraken X60 drive motors
             COTSTalonFXSwerveConstants.SDS.MK4i.KrakenX60(COTSTalonFXSwerveConstants.SDS.MK4i.driveRatios.L2);
 
@@ -95,8 +99,8 @@ public final class DriveConstants {
         public static final int driveMotorID = 6;
         public static final int angleMotorID = 5;
         public static final int canCoderID = 11;
-        public static InvertedValue driveMotorInvert = InvertedValue.Clockwise_Positive;
-        public static InvertedValue angleMotorInvert = InvertedValue.CounterClockwise_Positive;
+        public static final InvertedValue driveMotorInvert = InvertedValue.CounterClockwise_Positive;
+        public static final InvertedValue angleMotorInvert = InvertedValue.Clockwise_Positive;
         public static final Rotation2d angleOffset = Rotation2d.fromDegrees(-47.197);
         public static final SwerveModuleConstants constants = new SwerveModuleConstants(driveMotorID, angleMotorID, canCoderID, angleOffset, angleMotorInvert, driveMotorInvert);
     }
@@ -106,8 +110,8 @@ public final class DriveConstants {
         public static final int driveMotorID = 8;
         public static final int angleMotorID = 7;
         public static final int canCoderID = 12;
-        public static InvertedValue driveMotorInvert = InvertedValue.Clockwise_Positive;
-        public static InvertedValue angleMotorInvert = InvertedValue.CounterClockwise_Positive;
+        public static final InvertedValue driveMotorInvert = InvertedValue.CounterClockwise_Positive;
+        public static final InvertedValue angleMotorInvert = InvertedValue.Clockwise_Positive;
         public static final Rotation2d angleOffset = Rotation2d.fromDegrees(56.338);
         public static final SwerveModuleConstants constants = new SwerveModuleConstants(driveMotorID, angleMotorID, canCoderID, angleOffset, angleMotorInvert, driveMotorInvert);
     }
